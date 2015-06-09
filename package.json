@@ -7,7 +7,6 @@
     "cheerio": "^0.18.0",
     "lodash": "^2.4.2",
     "mongojs": "^0.18.2",
-    "mongoose": "^4.0.3",
     "request": "^2.47.0",
     "strip-ansi": "^2.0.1"
   },

@@ -42,15 +42,27 @@ tgsh.stdout.on('data', function(buffer) {
 	// Check if we just started up and handle the beautiful text.
 	// TODO: Pass this through to stdout to preserve cpright?
 	if (lines[0] == "Telegram-cli version 1.3.1, Copyright (C) 2013-2015 Vitaly Valtman") {
-		// console.log('wegothere'.green) 
-	
-	// Every other time we do this:
-	} else {
+		tg.event.emit('started')
+    // console.log('wegothere'.green)
+
+  } else if (lines[0].split(" ")[0] == 'User') {
+    // We just got told a user read a message. We don't /really/ car about this.
+    var tmp = lines[0].split(" ")
+    print_name = tmp[1]+'_'+tmp[2]
+
+    // We'll emit an event with the user's name.
+    tg.event.emit('readReceipt', print_name)
+
+  } else if (lines.length > 5) {
+    tg.event.emit('longMessage', lines)
+
+  // Every other time we do this:
+  }	else {
 
 		// Dev stuff.
-		console.log('lines: '.red + lines.length.toString().blue)
+		// console.log('lines: '.red + lines.length.toString().red)
 		tg.raw.push(lines)
-		console.log(lines)
+		// console.log(lines.toString().green)
 
 		// Usually the important stuff is here
 		var msg = ''
@@ -61,27 +73,35 @@ tgsh.stdout.on('data', function(buffer) {
 			msg = JSON.parse(lines[1])
 
 		} else {
-			msg = JSON.parse(lines[0])
+      try {
+        msg = JSON.parse(lines[0])
+      }
+      catch(e) {
+        tg.event.emit('unknownString', lines)
+        return
+      }
 		}
 
 		// Was the msg about a message?
-		if (msg.event == 'message') {
+		if ('text' in msg) {
 
-			console.log("We received a ".red + msg.event.toString().red + ' event'.red)
-			
+			// console.log("We received a ".red + msg.event.toString().red + ' event'.red)
+
 			// Was it to us?
 			if(msg.to.username == "sentencediary") {
-				console.log('It was to us')
+				// console.log('It was to us')
 				tg.event.emit('newmessage', msg)
 			}
 
 			// Was it from us?
 			if(msg.from.username == "sentencediary") {
-				console.log('It was from us')
+				// console.log('It was from us')
 				tg.event.emit('sentmessage', msg)
 			}
 
-		}
+		} else {
+      tg.event.emit('other', msg)
+    }
 	}
 })
 

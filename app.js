@@ -69,6 +69,9 @@ process.stdin.on('readable', function() {
 	}
 })
 
+process.on('exit', function(code) {
+	tg.close()
+})
 /**************************************************************************
 			Scripting
 */

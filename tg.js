@@ -16,6 +16,11 @@ tg.start = function () {
 
 tg.sh = tgsh
 
+tg.close = function () {
+  this.write('safe_quit')
+  tgsh.kill()
+}
+
 tg.event = new EventEmitter()
 
 // This does actually send texts!
@@ -31,10 +36,13 @@ tg.write = function (str) {
 
 tg.addContact = function(phone, firstName, LastName) {
 	this.write('add_contact ')
+  return this
 }
 
 tg.raw = []
 
+
+// Handle the output of tgcli
 tgsh.stdout.on('data', function(buffer) {
 	// console.log('wegotdataaswell'.cyan)
 	var lines = buffer.toString().split('\n').filter(Boolean)

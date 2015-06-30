@@ -15,6 +15,24 @@ var tg = require('./tg').start()
 var db = mongo(mongoURI, ['entries', 'users'])
 
 /**********************************************************************
+			Commands
+*/
+
+var keywords = {
+	'<help>': function(msg) {
+		var str = 'Send your diary sentences to this account and we will store them for you! '+
+							'Other commands include: <removeAllData>, <generateview>, <stats> and <date>. '+
+							'In order to see what they do send both <help> and a command in a message. For '+
+							'example: "<help> <generateview>" would give help about the <generateview> command.'
+		tg.send(msg.from.print_name, str)
+	}
+, '<removealldata>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')
+, '<generateview>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')
+, '<stats>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')
+, '<date>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')
+}
+
+/**********************************************************************
 			Listeners
 */
 
@@ -22,20 +40,26 @@ tg.event.on('started', function (d) {
 	console.log('yo, this dawg is kicking')
 })
 
-tg.event.on('newmessage', function (d) {
+tg.event.on('newmessage', function (m) {
 	console.log('-------------------------------------'.magenta)
-	console.log(('we got a message from '+d.from.first_name+' saying "'+d.text+'"').cyan)
+	console.log(('we got a message from '+m.from.first_name+' saying "'+m.text+'"').cyan)
 
-	db.entries.insert({
-		text: d.text
-	  , user: d.from.phone
-	  , date: +new Date
+	//Check for keywords
+	var words = m.text.replace('.',' ').split(" "),
+			caughtCommands = []
+	console.log(words)
+	words.forEach(function(word) {
+		if (word in keywords) caughtCommands.push(word);
 	})
 
-	// Strip the white space. It'll kill the message
-	d.text = d.text.replace(/\r?\n|\r/g, ' ')
+	if (caughtCommands.length==0) addToDatabase(m.from.id, m.text, +new Date);
+	else {
+		console.log('The following commands were caught:\n'+caughtCommands)
+	}
 
-	tg.send(d.from.print_name, 'Just received a message from you saying: "'+d.text+'"')
+	// Strip the white space. It'll kill the message
+	m.text = m.text.replace(/\r?\n|\r/g, ' ')
+	tg.send(m.from.print_name, 'Just received a message from you saying: "'+m.text+'"')
 })
 
 tg.event.on('longMessage', function (d) {
@@ -72,6 +96,15 @@ process.stdin.on('readable', function() {
 process.on('exit', function(code) {
 	tg.close()
 })
+
 /**************************************************************************
-			Scripting
+			Functions
 */
+
+addToDatabase = function (id, text, date) {
+	db.entries.insert({
+		text: text
+	, user: id
+	, date: date
+	})
+}

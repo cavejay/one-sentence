@@ -26,10 +26,10 @@ var keywords = {
 							'example: "<help> <generateview>" would give help about the <generateview> command.'
 		tg.send(msg.from.print_name, str)
 	}
-, '<removealldata>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet'}
-, '<generateview>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet'}
-, '<stats>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet'}
-, '<date>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet'}
+, '<removealldata>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')}
+, '<generateview>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')}
+, '<stats>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')}
+, '<date>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')}
 }
 
 /**********************************************************************

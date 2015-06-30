@@ -55,6 +55,8 @@ tg.event.on('newmessage', function (m) {
 	if (caughtCommands.length==0) addToDatabase(m.from.id, m.text, +new Date);
 	else {
 		console.log('The following commands were caught:\n'+caughtCommands)
+		// run the commands function
+		keywords[caughtCommands[0]](m)
 	}
 
 	// Strip the white space. It'll kill the message

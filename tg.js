@@ -69,7 +69,7 @@ tgsh.stdout.on('data', function(buffer) {
 
 		// Dev stuff.
 		// console.log('lines: '.red + lines.length.toString().red)
-		tg.raw.push(lines)
+		// tg.raw.push(lines)
 		// console.log(lines.toString().green)
 
 		// Usually the important stuff is here
@@ -77,8 +77,16 @@ tgsh.stdout.on('data', function(buffer) {
 
 		// If we just sent a message we'll get stars though, so catch that
 		if(lines[0].trim().split(' ')[0] == '***') {
-			// parse it
-			msg = JSON.parse(lines[1])
+      var msg = undefined
+			lines.forEach(function (l) {
+        if (l.trim().split(' ')[0] !== '***') msg = l
+      })
+      // parse it
+      if (msg === undefined) {
+        tg.event.emit('unknownString', lines)
+        return
+      }
+			msg = JSON.parse(msg)
 
 		} else {
       try {

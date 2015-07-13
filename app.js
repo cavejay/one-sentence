@@ -9,7 +9,7 @@ var mongo = require('mongojs')
 var mongoURI = require('./mongoKey')
 var colors = require('colors')
 var tg = require('./tg').start()
-require('./statics')
+var statics = require('./statics')
 
 // mongodb://<dbuser>:<dbpassword>@ds034878.mongolab.com:34878/sentence-diary
 
@@ -63,17 +63,31 @@ tg.event.on('newmessage', function (m) {
 	words.forEach(function(word) {
 		if (word in keywords) caughtCommands.push(word);
 	})
+	console.log('The following commands were caught:\n'+caughtCommands)
 
-	if (caughtCommands.length==0) addToDatabase(m.from.id, m.text, +new Date);
-	else if(caughtCommands.length==1 && caughtCommands[0]=='<help>'){
-		console.log('The following commands were caught:\n'+caughtCommands)
+	if (caughtCommands.length==0) { // No commands
+		addToDatabase(m.from.id, m.text, +new Date);
+
+		// Strip the white space. It'll kill the message
+		m.text = m.text.replace(/\r?\n|\r/g, ' ')
+		tg.send(m.from.print_name, 'A new diary entry was added saying: "'+m.text+'"')
+
+	} else if(caughtCommands.length==2 && caughtCommands.indexOf('<help>')>=0) {
+		// Find out what the other command is and send it's help message back.
+		helpPos = caughtCommands.indexOf('<help>')
+		otherCommandPos = (helpPos==0)? 1:0
+		console.log('returning help message for '+caughtCommands[otherCommandPos])
+		tg.send(m.from.print_name, statics.helpStrings[caughtCommands[otherCommandPos]])
+
+	} else if(caughtCommands.length==1){ // run the first command
 		// run the commands function
 		keywords[caughtCommands[0]](m)
+
+	} else {
+		tg.send(m.from.print_name, 'Too many commands were detected. ' +
+		'Please only send 1, or 2 when using the <help> command')
 	}
 
-	// Strip the white space. It'll kill the message
-	m.text = m.text.replace(/\r?\n|\r/g, ' ')
-	tg.send(m.from.print_name, 'Just received a message from you saying: "'+m.text+'"')
 })
 
 tg.event.on('longMessage', function (d) {

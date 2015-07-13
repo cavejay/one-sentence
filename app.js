@@ -26,10 +26,32 @@ var keywords = {
 							'example: "<help> <generateview>" would give help about the <generateview> command.'
 		tg.send(msg.from.print_name, str)
 	}
-, '<removealldata>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')}
-, '<generateview>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')}
-, '<stats>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')}
-, '<date>':function(msg) {tg.send(msg.from.print_name, 'not implemented yet')}
+, '<removealldata>':function(msg) {
+	var str = 'NOT CURRENTLY IMPLEMENTED. ' +
+						'Permanently removes all of the data relating to you from the server.' +
+						' There is no way to get it back, it will be gone forever. Legit.' +
+						' The previous sentences only apply if Ive not taken any sneaky backups.'
+	tg.send(msg.from.print_name, str)
+}
+, '<generateview>':function(msg) {
+	var str = 'NOT CURRENTLY IMPLEMENTED. '+
+						'Generates a webpage to view your diary entries on. A new webpage is created for ' +
+						'you each time with a random URL that is then sent to you.'
+	tg.send(msg.from.print_name, str)
+}
+, '<stats>':function(msg) {
+	var str = 'NOT CURRENTLY IMPLEMENTED. '+
+						'Returns a brief message that includes interesting stats on your use of the diary'
+	tg.send(msg.from.print_name, str)
+}
+, '<date>':function(msg) {
+	var str = 'NOT CURRENTLY IMPLEMENTED. '+
+						'Overrides the date you sent the message with the date immediately following '+
+						'the command. Dates must be in the format YYYYMMDD. For example: "<date> 20150722" ' +
+						'if the string following the command isnt a proper date a message will be returned ' +
+						'informing you of the failure'
+	tg.send(msg.from.print_name, str)
+}
 }
 
 /**********************************************************************
@@ -47,7 +69,7 @@ tg.event.on('newmessage', function (m) {
 	//Check for keywords
 	var words = m.text.replace('.',' ').split(" "),
 			caughtCommands = []
-	console.log(words)
+
 	words.forEach(function(word) {
 		if (word in keywords) caughtCommands.push(word);
 	})

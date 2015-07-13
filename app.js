@@ -9,6 +9,7 @@ var mongo = require('mongojs')
 var mongoURI = require('./mongoKey')
 var colors = require('colors')
 var tg = require('./tg').start()
+require('./statics')
 
 // mongodb://<dbuser>:<dbpassword>@ds034878.mongolab.com:34878/sentence-diary
 
@@ -27,32 +28,21 @@ var keywords = {
 		tg.send(msg.from.print_name, str)
 	}
 , '<removealldata>':function(msg) {
-	var str = 'NOT CURRENTLY IMPLEMENTED. ' +
-						'Permanently removes all of the data relating to you from the server.' +
-						' There is no way to get it back, it will be gone forever. Legit.' +
-						' The previous sentences only apply if Ive not taken any sneaky backups.'
+	var str = 'NOT CURRENTLY IMPLEMENTED. '
 	tg.send(msg.from.print_name, str)
 }
 , '<generateview>':function(msg) {
-	var str = 'NOT CURRENTLY IMPLEMENTED. '+
-						'Generates a webpage to view your diary entries on. A new webpage is created for ' +
-						'you each time with a random URL that is then sent to you.'
+	var str = 'NOT CURRENTLY IMPLEMENTED. '
 	tg.send(msg.from.print_name, str)
 }
 , '<stats>':function(msg) {
-	var str = 'NOT CURRENTLY IMPLEMENTED. '+
-						'Returns a brief message that includes interesting stats on your use of the diary'
+	var str = 'NOT CURRENTLY IMPLEMENTED. '
 	tg.send(msg.from.print_name, str)
 }
 , '<date>':function(msg) {
-	var str = 'NOT CURRENTLY IMPLEMENTED. '+
-						'Overrides the date you sent the message with the date immediately following '+
-						'the command. Dates must be in the format YYYYMMDD. For example: "<date> 20150722" ' +
-						'if the string following the command isnt a proper date a message will be returned ' +
-						'informing you of the failure'
+	var str = 'NOT CURRENTLY IMPLEMENTED. '
 	tg.send(msg.from.print_name, str)
-}
-}
+}}
 
 /**********************************************************************
 			Listeners
@@ -75,7 +65,7 @@ tg.event.on('newmessage', function (m) {
 	})
 
 	if (caughtCommands.length==0) addToDatabase(m.from.id, m.text, +new Date);
-	else {
+	else if(caughtCommands.length==1 && caughtCommands[0]=='<help>'){
 		console.log('The following commands were caught:\n'+caughtCommands)
 		// run the commands function
 		keywords[caughtCommands[0]](m)

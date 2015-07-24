@@ -56,15 +56,16 @@ tg.event.on('newmessage', function (m) {
 	console.log('-------------------------------------'.magenta)
 	console.log(('we got a message from '+m.from.first_name+' saying "'+m.text+'"').cyan)
 
-	//Check for keywords
+	//Check for keywords&commands
 	var words = m.text.replace('.',' ').split(" "),
 			caughtCommands = []
 
 	words.forEach(function(word) {
-		if (word in keywords) caughtCommands.push(word);
+		if (word.toLowerCase() in keywords) caughtCommands.push(word.toLowerCase());
 	})
 	console.log('The following commands were caught:\n'+caughtCommands)
 
+	// There was nothing so this must be a diary entry
 	if (caughtCommands.length==0) { // No commands
 		addToDatabase(m.from.id, m.text, +new Date);
 
@@ -72,6 +73,7 @@ tg.event.on('newmessage', function (m) {
 		m.text = m.text.replace(/\r?\n|\r/g, ' ')
 		tg.send(m.from.print_name, 'A new diary entry was added saying: "'+m.text+'"')
 
+	// We caught a specific help command
 	} else if(caughtCommands.length==2 && caughtCommands.indexOf('<help>')>=0) {
 		// Find out what the other command is and send it's help message back.
 		helpPos = caughtCommands.indexOf('<help>')
@@ -79,10 +81,12 @@ tg.event.on('newmessage', function (m) {
 		console.log('returning help message for '+caughtCommands[otherCommandPos])
 		tg.send(m.from.print_name, statics.helpStrings[caughtCommands[otherCommandPos]])
 
+	// We caught a single command and are running it
 	} else if(caughtCommands.length==1){ // run the first command
 		// run the commands function
 		keywords[caughtCommands[0]](m)
 
+	// Incase they went nuts with the commands nothing happens and they get a note.
 	} else {
 		tg.send(m.from.print_name, 'Too many commands were detected. ' +
 		'Please only send 1, or 2 when using the <help> command')

@@ -54,9 +54,13 @@ tg.event.on('started', function (d) {
 
 tg.event.on('newmessage', function (m) {
 	console.log('-------------------------------------'.magenta)
-	console.log(('we got a message from '+m.from.first_name+' saying "'+m.text+'"').cyan)
+	console.log(('we got a message from '+m.from.first_name).cyan)
 
-	//Check for keywords&commands
+	// Check if a new user here TODO
+	// Check user id against those in db and then send welcome message if not there
+	// Then return early
+
+	// Check for keywords&commands
 	var words = m.text.replace('.',' ').split(" "),
 			caughtCommands = []
 
@@ -64,6 +68,7 @@ tg.event.on('newmessage', function (m) {
 		if (word.toLowerCase() in keywords) caughtCommands.push(word.toLowerCase());
 	})
 	console.log('The following commands were caught:\n'+caughtCommands)
+
 
 	// There was nothing so this must be a diary entry
 	if (caughtCommands.length==0) { // No commands
@@ -134,6 +139,11 @@ process.on('exit', function(code) {
 */
 
 addToDatabase = function (id, text, date) {
+	// Pull information about user using id and user collection here
+
+	// Encrypt the user's information here
+
+	// Send the diary entry here
 	db.entries.insert({
 		text: text
 	, user: id

@@ -21,4 +21,9 @@ exports.helpStrings = {
 						'informing you of the failure'
 }
 
+exports.welcomeMessage = 'Hello & welcome new user to the Daily Commit-Log Sentence Diary (The name is un-confirmed atm). '+
+		'Your first message will be ignored so you should send it again if it was an entry!'+
+		" Available commands can be found by sending '<help>' in a message to this account."+
+		" This software is currently still pre-alpha so Please be aware that your data cannot be guranteed safety"
+
 module.exports = exports

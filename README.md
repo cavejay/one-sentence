@@ -21,7 +21,7 @@ Both of these features are being planned and should be implemented relatively so
 - Simple commands are recognised.
   - &#60;help> provides a general overview of the app and lists other commands. When sent with another command ie '&#60;help> &#60;stats>' it gives specific information about the other command.
   - &#60;removeAllData>, &#60;generateview>, &#60;stats> and &#60;date> are all currently recognised but not implemented.
-- When a command is recognised in a message the message is considered as a query and isn't sent to the database as a diary entry.
+- When a command is recognised in a message the message is considered a query and thus isn't sent to the database as a diary entry.
 
 ####To-do Feature list/Ideas
 

@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/no1mzb/one-sentence.git"
+    "url": "git+https://github.com/cavejay/one-sentence.git"
   },
   "keywords": [
     "telegram",
@@ -26,7 +26,7 @@
   "author": "Michael",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/no1mzb/one-sentence/issues"
+    "url": "https://github.com/cavejay/one-sentence/issues"
   },
-  "homepage": "https://github.com/no1mzb/one-sentence#readme"
+  "homepage": "https://github.com/cavejay/one-sentence#readme"
 }

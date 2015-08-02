@@ -6,9 +6,13 @@
 
 var _ = require('lodash') // libary just incase.
 var mongo = require('mongojs')
-var mongoURI = require('./mongoKey')
-var colors = require('colors')
-var tg = require('./tg').start()
+// var colors = require('colors')
+var argv = require('minimist')(process.argv.slice(2))
+
+if (!argv.debug) {
+  var mongoURI = require('./mongoKey')
+  var tg = require('./tg').start()
+}
 var statics = require('./statics')
 
 // mongodb://<dbuser>:<dbpassword>@ds034878.mongolab.com:34878/sentence-diary

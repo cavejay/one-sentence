@@ -19,10 +19,10 @@ tg.event.on('started', function (d) {
 tg.event.on('newmessage', function (m) {
   console.log('-------------------------------------'.magenta)
   console.log(('we got a message from ' + m.from.first_name).cyan)
-  console.log('BUT. We\'re on hiatus so we can\' response'.magenta)
+  console.log('BUT. We\'re on hiatus so we can\'t respond'.magenta)
 
   // Maybe offer to store someone's names and tell them when we're back up? idk.
-  tg.send(m.from.print_name, 'Hi there! Sorry but we\' this service is ' +
+  tg.send(m.from.print_name, 'Hi there! Sorry but this service is ' +
     'currently down or getting awesome new features! Apologies for not being a working diary atm. Checkback later')
 })
 

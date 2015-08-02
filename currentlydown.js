@@ -5,7 +5,7 @@
  *
 */
 
-var colors = require('colors')
+require('colors')
 var tg = require('./tg').start()
 
 /* *********************************************************************

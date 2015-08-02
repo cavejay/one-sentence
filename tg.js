@@ -1,8 +1,8 @@
 var spawn = require('child_process').spawn
-var stripAns = require('strip-ansi')
+// var stripAns = require('strip-ansi')
 var EventEmitter = require('events').EventEmitter
 var tgsh = spawn('./tg.sh')
-var colors = require('colors')
+require('colors')
 
 function tg () {
 
@@ -43,14 +43,12 @@ tg.raw = []
 
 // Handle the output of tgcli
 tgsh.stdout.on('data', function (buffer) {
-  // console.log('wegotdataaswell'.cyan)
   var lines = buffer.toString().split('\n').filter(Boolean)
 
   // Check if we just started up and handle the beautiful text.
   // TODO: Pass this through to stdout to preserve cpright?
   if (lines[0] === 'Telegram-cli version 1.3.1, Copyright (C) 2013-2015 Vitaly Valtman') {
     tg.event.emit('started')
-    // console.log('wegothere'.green)
 
   } else if (lines[0].split(' ')[0] === 'User') {
     // We just got told a user read a message. We don't /really/ car about this.

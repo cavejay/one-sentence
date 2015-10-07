@@ -31,3 +31,4 @@ node-telegram-bot
 onesentence.sublime-workspace
 mongoKey.js
 tmp
+lib/secrets.js

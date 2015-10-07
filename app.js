@@ -6,6 +6,7 @@
 
 var _ = require('lodash') // libary just incase.
 var mongo = require('mongojs')
+var crypt = require('lib/crypt')
 // var colors = require('colors')
 var argv = require('minimist')(process.argv.slice(2))
 
@@ -145,6 +146,7 @@ var addToDatabase = function addToDatabase (id, text, date) {
   // Pull information about user using id and user collection here
 
   // Encrypt the user's information here
+  // text = crypt.encrypt(text)
 
   // Send the diary entry here
   db.entries.insert({

@@ -11,5 +11,8 @@
     "url": "http://www.github.com/cavejay/one-sentence"
   },
   "author": "Michael",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "mongojs": "^2.0.0"
+  }
 }

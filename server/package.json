@@ -14,6 +14,6 @@
   "license": "ISC",
   "dependencies": {
     "mongojs": "^2.0.0",
-    "promise": "^7.0.4"
+    "promise": "^7.0.4",
   }
 }

@@ -11,6 +11,7 @@
     "minimalist": "^1.0.0",
     "mongojs": "^0.18.2",
     "npmlog": "^1.2.1",
+    "node-schedule": "^0.6.0",
     "request": "^2.47.0",
     "strip-ansi": "^2.0.1"
   },

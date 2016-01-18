@@ -1,0 +1,19 @@
+{
+  "name": "onesentenceserver",
+  "version": "0.0.1",
+  "description": "Handles rest APIs and db calls",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://www.github.com/cavejay/one-sentence"
+  },
+  "author": "Michael",
+  "license": "ISC",
+  "dependencies": {
+    "mongojs": "^2.0.0",
+    "promise": "^7.0.4",
+  }
+}

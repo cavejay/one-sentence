@@ -63,7 +63,6 @@ tgsh.stdout.on('data', function (buffer) {
 
   // Every other time we do this:
   } else {
-
     // Dev stuff.
     // console.log('lines: '.red + lines.length.toString().red)
     // tg.raw.push(lines)

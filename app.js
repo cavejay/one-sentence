@@ -5,10 +5,10 @@
 */
 
 var _ = require('lodash') // libary just incase.
-var mongo = require('mongojs')
 // var colors = require('colors')
 var argv = require('minimist')(process.argv.slice(2))
-var schedule = require('node-schedule');
+var schedule = require('node-schedule')
+var db = require('./lib/db')
 
 if (!argv.debug) {
   var mongoURI = require('./mongoKey')
@@ -16,24 +16,21 @@ if (!argv.debug) {
 }
 var statics = require('./lib/statics')
 
-// mongodb://<dbuser>:<dbpassword>@ds034878.mongolab.com:34878/sentence-diary
-
-var db = mongo(mongoURI, ['entries', 'users'])
-
-var reminders = require('reminders')(db) // Start reminders for all users
+// Start reminders for all users and tell use what to use to send messages
+var reminders = require('./lib/reminders')(db.db, tg.send)
 
 /* *********************************************************************
       Commands
 */
 
-var ErrorMsg = function ErrorMsg (str) {
-  tg.send(msg.from.print_name,
+var ErrorMsg = function ErrorMsg (user str) {
+  tg.send(user,
    'Detected too many or invalid words in your <' + str + '> command. ' +
    'Use \"<help> <' + str + '> for more detail\"');
 }
 
-var FailMsg = function FailMsg (str) {
-  tg.send(msg.from.print_name,
+var FailMsg = function FailMsg (user, str) {
+  tg.send(user,
    'Your <' + str + '> command failed to run for some reason.' +
    'Please try again or log an issue on this project\'s github page.')
 }
@@ -77,16 +74,20 @@ var keywords = {
     // Do the stuff
     switch (words.length) {
       case 1: // Reset a time
-        setReminderForUser(msg.from.id, false, function(err) {
-          if (!err) tg.send(msg.from.print_name, 'You have disabled daily reminders');
-          else FailMsg('reminder')
+        setReminderForUser(msg.from.print_name, false, function(err) {
+          if (!err) {
+            tg.send(msg.from.print_name, 'You have disabled daily reminders');
+            // reminders.removeUser(msg.from.print_name)
+          } else FailMsg('reminder')
         })
         break
       case 2: // Included a time
-        setReminderForUser(msg.from.id, time, function(err) {
-          if (!err) tg.send(msg.from.print_name, 'You will now be reminded at '+time.getHours()+':'+time.getMinutes()+
-          ' each day. To remove this reminder send \"<reminder>\" as a message.')
-          else FailMsg('reminder');
+        setReminderForUser(msg.from.print_name, time, function(err) {
+          if (!err) {
+            tg.send(msg.from.print_name, 'You will now be reminded at '+time.getHours()+':'+time.getMinutes()+
+              ' each day. To remove this reminder send \"<reminder>\" as a message.')
+            // reminders.addUser(msg.from.print_name, time)
+          } else FailMsg('reminder');
         })
         break
       default:
@@ -195,42 +196,3 @@ process.on('exit', function (code) {
 /* *************************************************************************
       Functions
 */
-
-/* Blindly add a new user to the db */
-var addUserToDatabase = function addUserToDatabase (id) {
-  db.users.insert({
-    userid: id,
-    reminder: false
-  })
-}
-
-/* State must be either a time or false */
-var setReminderForUser = function setReminderForUser (id, time, cb) {
-  db.users.findAndModify({
-    query: {userid: id},
-    update: {$set: {reminder: time}},
-    new: true
-  }, function (err, doc, lastErrorObject) {
-    if (err) console.err('Couldn\'t update the db')
-    cb(err)
-  });
-}
-
-/* return a user's information */
-var getUserFromDatabase = function getUserFromDatabase (id, cb) {
-  db.users.findOne({userid: id}, cb)
-}
-
-/* Add an entry to the db */
-var addToDatabase = function addToDatabase (id, text, date) {
-  // Pull information about user using id and user collection here
-
-  // Encrypt the user's information here
-
-  // Send the diary entry here
-  db.entries.insert({
-    text: text,
-    user: id,
-    date: date
-  })
-}

@@ -22,7 +22,7 @@ var reminders = require('./lib/reminders')(tg.send)
       Commands
 */
 
-var ErrorMsg = function ErrorMsg (user str) {
+var ErrorMsg = function ErrorMsg (user, str) {
   tg.send(user,
    'Detected too many or invalid words in your <' + str + '> command. ' +
    'Use \"<help> <' + str + '> for more detail\"');

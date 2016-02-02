@@ -8,7 +8,7 @@
  export CFLAGS="-I/usr/local/include -I/usr/local/Cellar/readline/6.3.8/include"
  export LDFLAGS="-L/usr/local/lib -L/usr/local/Cellar/readline/6.3.8/lib"
  export CPPFLAGS="-I/usr/local/opt/openssl/include -I/usr/local/opt/readline/include"
-export LDFLAGS="-L/usr/local/opt/openssl/lib -L/usr/local/opt/readline/lib"
+ export LDFLAGS="-L/usr/local/opt/openssl/lib -L/usr/local/opt/readline/lib"
 
  elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
      # Do something under Linux platform

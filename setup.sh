@@ -4,9 +4,11 @@
  if [ "$(uname)" == "Darwin" ]; then
      # Do something under Mac OS X platform
      echo "This is a MAC :D. Please have homebrew installed."
-brew install libconfig readline lua python libevent jansson
+ brew install libconfig readline lua python libevent jansson
  export CFLAGS="-I/usr/local/include -I/usr/local/Cellar/readline/6.3.8/include"
  export LDFLAGS="-L/usr/local/lib -L/usr/local/Cellar/readline/6.3.8/lib"
+ export CPPFLAGS="-I/usr/local/opt/openssl/include -I/usr/local/opt/readline/include"
+export LDFLAGS="-L/usr/local/opt/openssl/lib -L/usr/local/opt/readline/lib"
 
  elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
      # Do something under Linux platform

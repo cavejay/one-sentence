@@ -11,13 +11,12 @@ var schedule = require('node-schedule')
 var db = require('./lib/db')
 
 if (!argv.debug) {
-  var mongoURI = require('./mongoKey')
   var tg = require('./tg').start()
 }
 var statics = require('./lib/statics')
 
 // Start reminders for all users and tell use what to use to send messages
-var reminders = require('./lib/reminders')(db.db, tg.send)
+var reminders = require('./lib/reminders')(tg.send)
 
 /* *********************************************************************
       Commands
@@ -74,7 +73,7 @@ var keywords = {
     // Do the stuff
     switch (words.length) {
       case 1: // Reset a time
-        setReminderForUser(msg.from.print_name, false, function(err) {
+        reminders.setReminder(msg.from.print_name, false, function(err) {
           if (!err) {
             tg.send(msg.from.print_name, 'You have disabled daily reminders');
             // reminders.removeUser(msg.from.print_name)
@@ -82,7 +81,7 @@ var keywords = {
         })
         break
       case 2: // Included a time
-        setReminderForUser(msg.from.print_name, time, function(err) {
+        reminders.setReminder(msg.from.print_name, time, function(err) {
           if (!err) {
             tg.send(msg.from.print_name, 'You will now be reminded at '+time.getHours()+':'+time.getMinutes()+
               ' each day. To remove this reminder send \"<reminder>\" as a message.')

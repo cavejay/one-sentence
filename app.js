@@ -58,7 +58,7 @@ var keywords = {
     var str = 'NOT CURRENTLY IMPLEMENTED. ';
     tg.send(msg.from.print_name, str);
   },
-  '<reminder>': function reminderCommand (msg) {
+'reminder': function (msg) {
     // Validate the message
     var words = msg.text.split(' ');
     var time = (words[0] === '<reminder>') ? words[1] : words[0]; // only expecting 2 words

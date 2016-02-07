@@ -116,7 +116,7 @@ tg.event.on('newmessage', function (m) {
     if (err) console.err('Ran into an error when checking if user exists');
     console.log('doc: ' + require('util').inspect(doc, { depth: null }));
     if (doc === null) { // This is a new user
-      db.dbAddUser(m.from.id);
+      db.dbAddUser(m.from);
       tg.send(m.from.print_name, 'Hi! Welcome to Cavejay\'s Single Sentence Diary Implementation. ' +
         ' Type \"<help>\" to get started!');
     }
@@ -133,7 +133,7 @@ tg.event.on('newmessage', function (m) {
 
   // There was nothing so this must be a diary entry
   if (caughtCommands.length === 0) { // No commands
-    db.dbAddUser(m.from.id, m.text, +new Date());
+    db.dbAddEntry(m.from.id, m.text, +new Date());
 
     // Strip the white space. It'll kill the message
     m.text = m.text.replace(/\r?\n|\r/g, ' ');

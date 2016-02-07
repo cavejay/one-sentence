@@ -7,16 +7,12 @@
 var _ = require('lodash'); // libary just incase.
 // var colors = require('colors')
 var argv = require('minimist')(process.argv.slice(2));
-var scheduler = require('node-schedule');
 var db = require('./lib/db');
 
 if (!argv.debug) {
   var tg = require('./tg').start();
 }
 var statics = require('./lib/statics');
-
-// Start reminders for all users and tell use what to use to send messages
-var reminders = require('./lib/reminders')(tg.send);
 
 /* *********************************************************************
       Commands
@@ -58,7 +54,12 @@ var keywords = {
     var str = 'NOT CURRENTLY IMPLEMENTED. ';
     tg.send(msg.from.print_name, str);
   },
-'<reminder>': function (msg) {
+  '<reminder>': function (msg) {
+    var str = 'NOT CURRENTLY IMPLEMENTED. ';
+    tg.send(msg.from.print_name, str);
+    return;
+
+    /** THE BELOW IS UNUSED CODE RESERVED FOR LATER USE **/
     // Validate the message
     var words = msg.text.split(' ');
     var time = (words[0] === '<reminder>') ? words[1] : words[0]; // only expecting 2 words

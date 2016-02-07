@@ -114,6 +114,7 @@ tg.event.on('newmessage', function (m) {
   // Then return early
   db.dbGetUser(m.from.id, function (err, doc) {
     if (err) console.err('Ran into an error when checking if user exists');
+    console.log('doc: '+ require('util').inspect(doc, { depth: null }));
     if (!doc) { // This is a new user
       db.dbAddUser(m.from.id);
       tg.send(m.from.print_name, 'Hi! Welcome to Cavejay\'s Single Sentence Diary Implementation. ' +

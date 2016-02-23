@@ -113,7 +113,7 @@ tg.event.on('newmessage', function (m) {
   // Check user id against those in db and then send welcome message if not there
   // Then return early
   db.dbGetUser(m.from.id, function (err, doc) {
-    if (err) console.err('Ran into an error when checking if user exists'.red);
+    if (err) console.error('Ran into an error when checking if user exists'.red);
     // console.log('doc: ' + require('util').inspect(doc, { depth: null }));
     if (doc === null) { // This is a new user
       console.log((m.from.first_name + ' is a new user. We\'re sending them a message').cyan);

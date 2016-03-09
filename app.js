@@ -130,10 +130,10 @@ tg.event.on('newmessage', function (m) {
   words.forEach(function (word) {
     if (word.toLowerCase() in keywords) caughtCommands.push(word.toLowerCase());
   });
-  console.log('The following commands were caught:\n' + caughtCommands);
-
+  
   // There was nothing so this must be a diary entry
   if (caughtCommands.length === 0) { // No commands
+    console.log('No commands were caught: ' + caughtCommands);
     db.dbAddEntry(m.from.id, m.text, +new Date(), function afterNewEntry (err, doc) {
       if (err) {
         console.log('A database error prevented the diary from being saved: '.red + err);
@@ -146,6 +146,7 @@ tg.event.on('newmessage', function (m) {
 
   // We caught a specific help command
   } else if (caughtCommands.length === 2 && caughtCommands.indexOf('<help>') >= 0) {
+    console.log('Caught a Help command: ' + caughtCommands);
     // Find out what the other command is and send it's help message back.
     var helpPos = caughtCommands.indexOf('<help>');
     var otherCommandPos = (helpPos === 0) ? 1 : 0;
@@ -154,11 +155,14 @@ tg.event.on('newmessage', function (m) {
 
   // We caught a single command and are running it
   } else if (caughtCommands.length === 1) { // run the first command
+    console.log('Caught a single command to run: ' + caughtCommands);
+
     // run the commands function
     keywords[caughtCommands[0]](m);
 
   // Incase they went nuts with the commands nothing happens and they get a note.
   } else {
+    console.log('Caught more than 1 command: ' + caughtCommands);
     tg.send(m.from.print_name, 'Too many commands were detected. ' +
     'Please only send 1, or 2 when using the <help> command');
   }

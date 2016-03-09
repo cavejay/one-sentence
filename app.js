@@ -134,11 +134,11 @@ tg.event.on('newmessage', function (m) {
 
   // There was nothing so this must be a diary entry
   if (caughtCommands.length === 0) { // No commands
-    db.dbAddEntry(m.from.id, m.text, +new Date());
-
-    // Strip the white space. It'll kill the message
-    m.text = m.text.replace(/\r?\n|\r/g, ' ');
-    tg.send(m.from.print_name, 'A new diary entry was added saying: "' + m.text + '"');
+    db.dbAddEntry(m.from.id, m.text, +new Date(), function afterNewEntry () {
+      // Strip the white space. It'll kill the message
+      m.text = m.text.replace(/\r?\n|\r/g, ' ');
+      tg.send(m.from.print_name, 'A new diary entry was added saying: "' + m.text + '"');
+    });
 
   // We caught a specific help command
   } else if (caughtCommands.length === 2 && caughtCommands.indexOf('<help>') >= 0) {

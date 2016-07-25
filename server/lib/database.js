@@ -1,5 +1,4 @@
-var mongo = require('rethinkdbdash');
-var mongo = require('promise');
+var r = require('rethinkdbdash');
 var database = {};
 
 // callback = function(data) {}
@@ -27,7 +26,6 @@ var database = {};
 
 database.init = function() {
 }
-
 
 /***************	User	***************/
 

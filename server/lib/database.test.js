@@ -63,3 +63,18 @@ describe('Basic db test', function () {
     })
   });
 });
+
+describe('Users', function () {
+  it('Creates correct users');
+  it('updates user information');
+  it('removes user information');
+  it('fetches correct users');
+
+});
+
+describe('Diary Entries', function () {
+  it('gets added to users correctly');
+  it('can be removed from users correctly');
+  it('can be updated by users correctly');
+  
+});

@@ -1,5 +1,5 @@
 var restify = require('restify'),
-		fs 			= require('fs'),
+		fs 			= require('fs'), // needed for cert and key of server (if https)
 		db 	= require('./lib/database.js');
 
 var server = restify.createServer({
@@ -76,15 +76,16 @@ server.get('/login/:uid', function(req, res, next) {
 	return next();
 });
 
-server.post('/hello', function create(req, res, next) {
-	res.send(201, Math.random().toString(36).substr(3,8));
+server.get('/hello', function create(req, res, next) {
+	res.send(201, make_session(''));
 	return next();
 })
 
 /***************		Utility Functions		***************/
 
 var make_session = function(uid) {
-	var seesionID = Math.floor((Math.random() * 1927473824) + 1);
-	logged_in[uid] = sessionID;
+	var sessionID = Math.floor((Math.random() * 100 * Math.random() * 1927473824) + 1);
+	logged_in[uid] = sessionID; // http://security.stackexchange.com/questions/24850/choosing-a-session-id-algorithm-for-a-client-server-relationship
 	logged_in[sessionID] = uid;
+  return sessionID;
 }

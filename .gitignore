@@ -31,3 +31,5 @@ node-telegram-bot
 onesentence.sublime-workspace
 mongoKey.js
 tmp
+
+rethinkdb_data

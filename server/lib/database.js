@@ -1,8 +1,6 @@
-var mongo = require('mongojs');
+var mongo = require('rethinkdbdash');
 var mongo = require('promise');
 var database = {};
-var uri = 'mongodb://localhost:27017/one-sentence';
-var db = null;
 
 // callback = function(data) {}
 // callback = function(data, error) {}
@@ -28,14 +26,13 @@ var db = null;
 // }
 
 database.init = function() {
-	db = mongo(uri, ['users']);
 }
 
 
 /***************	User	***************/
 
 database.makeUser = function(user_object, callback) {
-	if(db.db.users.insert(user_object);
+
 }
 
 database.removeUser = function(user_uid, callback) {
@@ -43,7 +40,6 @@ database.removeUser = function(user_uid, callback) {
 }
 
 database.getUserSettings = function(user_uid, callback, reqData) {
-	database.checkForUser()
 }
 
 database.updateUserSettings = function(user_uid, user_settings, callback) {
@@ -52,13 +48,6 @@ database.updateUserSettings = function(user_uid, user_settings, callback) {
 
 // callback is passed true or false depending on whether the user exists.
 database.checkForUser = function(user_uid, callback, data) {
-	db.users.find({username: user_uid}, function (err, docs, data) {
-    if(!docs) {
-			callback(false, data);
-		} else {
-			callback(true, data);
-		}
-	});
 }
 
 

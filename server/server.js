@@ -34,7 +34,7 @@ server.post('/diaryentry/user/:uid/create', function(req, res, next) {
 });
 
 // Get a diary entry
-server.get('/diaryentry/user/:uid/:entryid/fetch', function(req, res, next) {
+server.get('/diaryentry/user/:uid/fetch/:entryid', function(req, res, next) {
 	console.log('got an access to a user entry');
 	res.send(200, "received a get for a diary entry '" + req.params.entryid + "' for "+ req.params.uid);
 	return next();

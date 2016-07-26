@@ -38,6 +38,7 @@ database.removeUser = function(user_uid, callback) {
 }
 
 database.getUserSettings = function(user_uid, callback, reqData) {
+
 }
 
 database.updateUserSettings = function(user_uid, user_settings, callback) {
@@ -46,6 +47,7 @@ database.updateUserSettings = function(user_uid, user_settings, callback) {
 
 // callback is passed true or false depending on whether the user exists.
 database.checkForUser = function(user_uid, callback, data) {
+  
 }
 
 

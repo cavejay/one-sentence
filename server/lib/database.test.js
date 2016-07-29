@@ -2,14 +2,37 @@
 var r = require('rethinkdbdash')();
 var db = require('./database');
 
+var cleanTables = () => {
+  var t = function (a) {
+    if (a.length > 1) {
+      return r.tableDrop(a.shift()).run().then(() => {
+        return t(a);
+      });
+    } else {
+      return r.tableDrop(a.shift()).run();
+    }
+  };
+
+  return r.tableList().run().then(tables => {
+    return t(tables);
+  });
+}
+
 beforeEach(function (done) {
-  r.tableCreate('test').run().then(result => {
+  r.tableList().run().then(result => {
+    if (result.length > 0) {
+      console.log('There are uncleaned Tables: ', result);
+    }
+    return cleanTables();
+  }).then(() => {
+    return r.tableCreate('test').run();
+  }).then(result => {
     done();
   });
 });
 
 afterEach(function (done) {
-  r.tableDrop('test').run().then(result => {
+  cleanTables().then(() => {
     done();
   });
 })
@@ -64,6 +87,20 @@ describe('Basic db test', function () {
   });
 });
 
+describe('Upkeep', function () {
+  it.skip('creates correctly identifies missing tables', (done) => {
+    var expected = ['users', 'entries'];
+    db.init().then(() => {
+      r.tablelist().run().then((tables) => {
+        if (expected == tables) {
+          done();
+        }
+      });
+    });
+  });
+
+});
+
 describe('Users', function () {
   it('Creates correct users');
   it('updates user information');
@@ -76,5 +113,5 @@ describe('Diary Entries', function () {
   it('gets added to users correctly');
   it('can be removed from users correctly');
   it('can be updated by users correctly');
-  
+
 });

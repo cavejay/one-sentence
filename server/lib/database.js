@@ -1,4 +1,4 @@
-var r = require('rethinkdbdash');
+var r = require('rethinkdbdash')();
 var database = {};
 
 // callback = function(data) {}
@@ -26,7 +26,7 @@ var database = {};
 database.init = function () {
   // a simple temp function
   var makeEntriesTable = function (tables) {
-    if (!tables.contains('entries')) {
+    if (tables.indexOf('entries') < 0) {
       console.log('[DATABASE] No \'entries\' table');
       return r.tableCreate('entries').run().then(() => {
         console.log('[DATABASE] Created \'entries\' table');
@@ -35,7 +35,7 @@ database.init = function () {
   }
 
   return r.tableList().run().then(tables => {
-    if (!tables.contains('users')) {
+    if (tables.indexOf('users') < 0) {
       console.log('[DATABASE] No \'users\' table');
       return r.tableCreate('users').run().then(() => {
         console.log('[DATABASE] Created \'users\' table');
@@ -70,32 +70,91 @@ database.checkForUser = function(user_uid, callback, data) {
 }
 
 // entry = {
+//   eid: '',
 //   uid: '',
 //   datetime: '',
 // 	 text: '',
 //   oldtext: '',
-//   deleted: false
+//   deleted: false,
+//   location: [lat, long]?
 // }
 
 /***************	Diary Entries	***************/
-database.getEntry = function(uid, entryid, callback) {
-
+database.getEntry = function(entryid, callback) {
+  if (callback == undefined) {
+    return r.table('entries').get(entryid).run();
+  } else {
+    r.table('entries').get(entryid).run().then((result) => {
+      callback(result);
+    })
+  }
 }
 
 database.getEntryRange = function(uid, from, to, callback) {
-
+  if (callback == undefined) {
+    return r.table('entries').filter(r.and(
+      r.row("datetime").lt(to),
+      r.row("datetime").gt(from),
+      r.row("uid").eq(uid)
+    )).run();
+  } else {
+    r.table('entries').filter(r.and(
+      r.row("datetime").lt(to),
+      r.row("datetime").gt(from),
+      r.row("uid").eq(uid)
+    )).run().then((result) => {
+      callback(result);
+    });
+  }
 }
 
-database.updateEntry = function(uid, entryid, entry_object, callback) {
-
+database.updateEntry = function(entryid, entry_object, callback) {
+  var next;
+  if (callback == undefined) {
+    return r.table('entries').get(entryid).run().then(result => {
+      next = result;
+      next.oldtext = next.text;
+      next.text = entry_object.text;
+      return r.table('entries').get(entryid).update(next).run();
+    }).then(() => {
+      return new Promise(function(resolve, reject) {
+        resolve(next);
+      })
+    });
+  } else {
+    r.table('entries').get(entryid).run().then(result => {
+      next = result;
+      next.oldtext = next.text;
+      next.text = entry_object.text;
+      return r.table('entries').get(entryid).update(next).run();
+    }).then(() => {
+      callback(next);
+    });
+  }
 }
 
-database.makeEntry = function(uid, entry_object, callback) {
-
+database.makeEntry = function(entry_object, callback) {
+  if (callback == undefined) {
+    return r.table('entries').insert(entry_object).run().then(result => {
+      return new Promise(function(resolve, reject) {
+        resolve(result.generated_keys[0]);
+      })
+    });
+  } else {
+    r.table('entries').insert(entry_object).run().then(result => {
+      callback(result.generated_keys[0]);
+    })
+  }
 }
 
-database.removeEntry = function(uid, entryid, callback) {
-
+database.removeEntry = function(entryid, callback) {
+  if (callback == undefined) {
+    return r.table('entries').get(entryid).delete().run();
+  } else {
+    r.table('entries').get(entryid).delete().run().then(result => {
+      callback(result);
+    })
+  }
 }
 
 // Used to ensure the entry is valid

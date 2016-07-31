@@ -1,6 +1,6 @@
 {
   "name": "onesentenceserver",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Handles rest APIs and db calls",
   "main": "server.js",
   "scripts": {

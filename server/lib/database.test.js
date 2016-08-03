@@ -41,7 +41,7 @@ afterEach(function (done) {
   });
 })
 
-describe('Basic db test', function () {
+describe('Basic db test -- ', function () {
   it('can store documents', (done) => {
     r.table('test')
       .insert({
@@ -86,7 +86,7 @@ describe('Basic db test', function () {
   });
 });
 
-describe('db initialiasation', function () {
+describe('db initialiasation -- ', function () {
   it('creates correct tables', done => {
     var expected = ['users', 'entries', 'test']; // TODO this shouldn't include test
     db.init().then(function () {
@@ -124,96 +124,137 @@ describe('db initialiasation', function () {
   });
 });
 
-describe('Users', function () {
-  it('Creates correct users');
-  it('updates user information');
-  it('removes user information');
-  it('fetches correct users');
-  it('can fetch all entries of a single user');
-  it('can fetch all entries of a single user as entryids');
-  it('can fetch x entries from entry y for a single user');
+describe('Users Endpoints -- ', function () {
+  var ex = {
+    name: ['First', 'last'],
+    username: 'user1',
+    pwhash: '1jjkjl12k39sad'
+  };
+
+  describe('The User creation endpoint:', function () {
+    it('correctly creates users', done => {
+      r.tableCreate('users').run().then(() => {
+        return db.makeUser(ex.username, ex.name[0], ex.name[1], ex.pwhash);
+      }).then(result => {
+        return r.table('users').get(result).run();
+      }).then(result => {
+        assert.deepEqual(ex, result);
+        done();
+      });
+    });
+  });
+
+  describe('The User update endpoint:', function () {
+    it('updates user information', done => {
+      var ee = Object.assign({}, ex);
+      r.tableCreate('users').run().then(() => {
+        return r.table('users').insert(ee).run();
+      }).then(result => {
+        return db.updateUserSettings;
+      })
+    });
+  });
+
+  describe('The User delete endpoint:', function () {
+    it('removes user information');
+  });
+
+  describe('The User fetch/get endpoint:', function () {
+    it('fetches correct users');
+    it('can fetch all entries of a single user');
+    it('can fetch all entries of a single user as entryids');
+    it('can fetch x entries from entry y for a single user');
+  });
 });
 
-describe('Diary Entries', function () {
+describe('Diary Entry Endpoints --', function () {
   var test_uid = '000231-1231230';
 
-  they('get added to users correctly', done => {
-    var entry = makeEntryObj(test_uid, 1469995208111, 'test entry');
-    r.tableCreate('entries').run().then(() => {
-      return db.makeEntry(entry);
-    }).then(eid => {
-      entry.id = eid;
-      return r.table('entries').get(eid).run();
-    }).then(result => {
-      assert.deepEqual(entry, result);
-      done();
-    })
-  });
-
-  they('can be removed from users correctly', done => {
-    var entry = makeEntryObj(test_uid, 1469995208111, 'test entry');
-    r.tableCreate('entries').run().then(() => {
-      return r.table('entries').insert(entry).run();
-    }).then((result) => {
-      entry.eid = result.generated_keys[0];
-      return db.removeEntry(entry.eid);
-    }).then(() => {
-      return r.table('entries').get(entry.eid).run();
-    }).then(result => {
-      if (result == null) {
+  describe('The entry creation endpoint:', function () {
+    it('makes diary entries correctly', done => {
+      var entry = makeEntryObj(test_uid, 1469995208111, 'test entry');
+      r.tableCreate('entries').run().then(() => {
+        return db.makeEntry(entry);
+      }).then(eid => {
+        entry.id = eid;
+        return r.table('entries').get(eid).run();
+      }).then(result => {
+        assert.deepEqual(entry, result);
         done();
-      }
+      })
     });
   });
 
-  they('can be updated by users correctly', done => {
-    var entry = makeEntryObj(test_uid, 1469995208111, 'test entry test');
-    r.tableCreate('entries').run().then(() => {
-      return r.table('entries').insert(entry).run();
-    }).then((result) => {
-      entry.id = result.generated_keys[0];
-      entry.oldtext = entry.text;
-      entry.text = "This is the updated";
-      return db.updateEntry(entry.id, {text: entry.text});
-    }).then((result) => {
-      assert.deepEqual(result, entry);
-      return db.getEntry(entry.id);
-    }).then(result => {
-      assert.deepEqual(entry, result);
-      done();
+  describe('the entry removal endpoint:', function () {
+    it('removes entries correctly', done => {
+      var entry = makeEntryObj(test_uid, 1469995208111, 'test entry');
+      r.tableCreate('entries').run().then(() => {
+        return r.table('entries').insert(entry).run();
+      }).then((result) => {
+        entry.eid = result.generated_keys[0];
+        return db.removeEntry(entry.eid);
+      }).then(() => {
+        return r.table('entries').get(entry.eid).run();
+      }).then(result => {
+        if (result == null) {
+          done();
+        }
+      });
     });
   });
 
-  they('can be retrieved singularly', done => {
-    var entry = makeEntryObj(test_uid, 1469995208111, 'test entry test');
-    r.tableCreate('entries').run().then(() => {
-      return r.table('entries').insert(entry).run();
-    }).then((result) => {
-      entry.id = result.generated_keys[0];
-      return r.table('entries').insert(makeEntryObj("1231232-31238849", 144998923, 'other test entry')).run();
-    }).then(() => {
-      return db.getEntry(entry.id);
-    }).then(result => {
-      assert.deepEqual(entry, result);
-      done();
+  describe('the entry update endpoint:', function () {
+    it('updates entries correctly', done => {
+      var entry = makeEntryObj(test_uid, 1469995208111, 'test entry test');
+      r.tableCreate('entries').run().then(() => {
+        return r.table('entries').insert(entry).run();
+      }).then((result) => {
+        entry.id = result.generated_keys[0];
+        entry.oldtext = entry.text;
+        entry.text = "This is the updated";
+        return db.updateEntry(entry.id, {text: entry.text});
+      }).then((result) => {
+        assert.deepEqual(result, entry);
+        return db.getEntry(entry.id);
+      }).then(result => {
+        assert.deepEqual(entry, result);
+        done();
+      });
     });
   });
 
-  they('and as a range of dates', done => {
-    var entry_in = makeEntryObj(test_uid, 1469995208111, 'test entry test');
-    var entry2_in = makeEntryObj(test_uid, 1469995248111, 'test');
-    var entry3_out = makeEntryObj(test_uid, 1469995288111, 'blah test');
-    var entry4_out = makeEntryObj("00123-12345512", 1469995288111, 'blah test');
-    r.tableCreate('entries').run().then(() => {
-      return r.table('entries').insert([entry_in, entry2_in, entry3_out, entry4_out]).run();
-    }).then((result) => {
-      entry_in.id = result.generated_keys[0];
-      entry2_in.id = result.generated_keys[1];
-      entry3_out.id = result.generated_keys[2];
-      return db.getEntryRange(test_uid, 1469995208000, 1469995250000);
-    }).then(result => {
-      assert.deepEqual([entry_in, entry2_in], result);
-      done();
+  describe('the entry fetching endpoint:', function () {
+    it('can retrieve a single entry', done => {
+      var entry = makeEntryObj(test_uid, 1469995208111, 'test entry test');
+      r.tableCreate('entries').run().then(() => {
+        return r.table('entries').insert(entry).run();
+      }).then((result) => {
+        entry.id = result.generated_keys[0];
+        return r.table('entries').insert(makeEntryObj("1231232-31238849", 144998923, 'other test entry')).run();
+      }).then(() => {
+        return db.getEntry(entry.id);
+      }).then(result => {
+        assert.deepEqual(entry, result);
+        done();
+      });
+    });
+
+    it('can retrieve a time-range of entries', done => {
+      var entry_in = makeEntryObj(test_uid, 1469995208111, 'test entry test');
+      var entry2_in = makeEntryObj(test_uid, 1469995248111, 'test');
+      var entry3_out = makeEntryObj(test_uid, 1469995288111, 'blah test');
+      var entry4_out = makeEntryObj("00123-12345512", 1469995288111, 'blah test');
+      r.tableCreate('entries').run().then(() => {
+        return r.table('entries').insert([entry_in, entry2_in, entry3_out, entry4_out]).run();
+      }).then((result) => {
+        entry_in.id = result.generated_keys[0];
+        entry2_in.id = result.generated_keys[1];
+        entry3_out.id = result.generated_keys[2];
+        return db.getEntryRange(test_uid, 1469995208000, 1469995250000);
+      }).then(result => {
+        assert.deepEqual([entry_in, entry2_in], result);
+        done();
+      });
     });
   });
 });

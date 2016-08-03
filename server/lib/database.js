@@ -48,7 +48,7 @@ database.init = function () {
 
 /***************	User	***************/
 
-database.makeUser = function(user_object, callback) {
+database.makeUser = function(username, first, last, pwhash, callback) {
 
 }
 
@@ -108,13 +108,14 @@ database.getEntryRange = function(uid, from, to, callback) {
       r.row("datetime").lt(to),
       r.row("datetime").gt(from),
       r.row("uid").eq(uid)
-    )).run();
+    )).orderBy('datetime').run();
   } else {
     r.table('entries').filter(r.and(
       r.row("datetime").lt(to),
       r.row("datetime").gt(from),
       r.row("uid").eq(uid)
-    )).run().then((result) => {
+    )).orderBy('datetime')
+    .run().then((result) => {
       callback(result);
     });
   }

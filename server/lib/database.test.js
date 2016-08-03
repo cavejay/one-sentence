@@ -50,8 +50,7 @@ describe('Basic db test', function () {
       }).run()
     .then((result) => {
       return r.table('test').run();
-    })
-    .then((result) => {
+    }).then((result) => {
       if (result[0].name == 'hi') {
         done();
       }
@@ -63,11 +62,9 @@ describe('Basic db test', function () {
     .then((result) => {
       key = result.generated_keys[0];
       return r.table('test').get(key).update({newField: 'HAHA!'}).run();
-    })
-    .then((result) => {
+    }).then((result) => {
       return r.table('test').get(key).run();
-    })
-    .then((result) => {
+    }).then((result) => {
       if (result.newField == 'HAHA!') {
         done();
       }
@@ -79,11 +76,9 @@ describe('Basic db test', function () {
     .then(result => {
       key = result.generated_keys[0];
       return r.table('test').get(key).delete().run();
-    })
-    .then(result => {
+    }).then(result => {
       return r.table('test').get(key).run();
-    })
-    .then((result) => {
+    }).then((result) => {
       if (result == null) {
         done();
       }
@@ -134,6 +129,9 @@ describe('Users', function () {
   it('updates user information');
   it('removes user information');
   it('fetches correct users');
+  it('can fetch all entries of a single user');
+  it('can fetch all entries of a single user as entryids');
+  it('can fetch x entries from entry y for a single user');
 });
 
 describe('Diary Entries', function () {

@@ -45,6 +45,12 @@ server.get('/diaryentry/user/:uid/fetch/:date1/to/:date2', function(req, res, ne
   return next();
 });
 
+server.get('/diaryentry/user/:uid/fetch/', function(req, res, next) {
+  console.log('[API] fetch for all entries by %s', req.params.uid, req.params.date1, req.params.date2);
+  res.send(200, "recieved a GET for all entries");
+  return next();
+});
+
 // Update a diary entry
 server.put('/diaryentry/user/:uid/update/:entryid', function(req, res, next) {
 	console.log('[API] update for %s by %s', req.params.entryid, req.params.uid);

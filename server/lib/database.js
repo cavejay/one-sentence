@@ -64,6 +64,18 @@ database.updateUserSettings = function(user_uid, user_settings, callback) {
 
 }
 
+database.getAllEntriesForUser = function(uid, onlyIds, callback) {
+
+}
+
+database.getEntriesFromEntry = function(uid, start_eid, num, callback) {
+
+};
+
+database.getXEntriesByUser = function(uid, eid, number, callback) {
+
+};
+
 // callback is passed true or false depending on whether the user exists.
 database.checkForUser = function(user_uid, callback, data) {
 

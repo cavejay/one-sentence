@@ -1,0 +1,10 @@
+# Node
+language: node_js
+node_js:
+  - "6"
+
+addons:
+  rethinkdb: "2.3"
+
+before_script:
+  - cd server

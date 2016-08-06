@@ -132,13 +132,15 @@ describe('Users Endpoints -- ', function () {
   };
 
   describe('The User creation endpoint:', function () {
+    var ee = Object.assign({}, ex);
     it('correctly creates users', done => {
       r.tableCreate('users').run().then(() => {
         return db.makeUser(ex.username, ex.name[0], ex.name[1], ex.pwhash);
       }).then(result => {
+        ee.id = result;
         return r.table('users').get(result).run();
       }).then(result => {
-        assert.deepEqual(ex, result);
+        assert.deepEqual(ee, result);
         done();
       });
     });
@@ -146,24 +148,153 @@ describe('Users Endpoints -- ', function () {
 
   describe('The User update endpoint:', function () {
     it('updates user information', done => {
+      var id;
       var ee = Object.assign({}, ex);
+      ee.name[0] = 'Not the';
+      ee.settings = {tracking: false};
       r.tableCreate('users').run().then(() => {
-        return r.table('users').insert(ee).run();
+        return r.table('users').insert(ex).run();
       }).then(result => {
-        return db.updateUserSettings;
-      })
+        id = result.generated_keys[0];
+        return db.updateUser(id, ee);
+      }).then(() => {
+        return r.table('users').get(id).run();
+      }).then(result => {
+        ee.id = id;
+        assert.deepEqual(ee, result);
+        done();
+      });
     });
   });
 
   describe('The User delete endpoint:', function () {
-    it('removes user information');
+    it('removes user information', done => {
+      var ee = Object.assign({}, ex);
+      r.tableCreate('users').run().then(() => {
+        return r.table('users').insert(ee).run();
+      }).then((result) => {
+        ee.id = result.generated_keys[0];
+        return db.removeUser(ee.id);
+      }).then(() => {
+        return r.table('users').get(ee.id).run();
+      }).then(result => {
+        if (result == null) {
+          done();
+        }
+      });
+    });
   });
 
   describe('The User fetch/get endpoint:', function () {
-    it('fetches correct users');
-    it('can fetch all entries of a single user');
-    it('can fetch all entries of a single user as entryids');
-    it('can fetch x entries from entry y for a single user');
+    it('fetches the correct user', done => {
+      var ee = Object.assign({}, ex);
+      r.tableCreate('users').run().then(() => {
+        return r.table('users').insert(ee).run();
+      }).then((result) => {
+        ee.id = result.generated_keys[0];
+        return db.makeUser('lolcat', 'hi', 'there', '123241');
+      }).then(() => {
+        return db.getUser(ee.id);
+      }).then(result => {
+        assert.deepEqual(ee, result);
+        done();
+      });
+    });
+
+    it('can fetch all entries of a single user', done => {
+      var uid;
+      var entries = [];
+      r.tableCreate('users').run().then(() => {
+        return r.tableCreate('entries').run();
+      }).then(() => {
+        return db.makeUser('test', 'te', 'st', '123013j');
+      }).then(id => {
+        uid = id;
+        entries[0] = makeEntryObj(uid, 0123123123, 'diary text');
+        entries[1] = makeEntryObj(uid, 0189787778, 'a;lsdkfjadsf');
+        entries[2] = makeEntryObj(uid, 0129769769, 'this is life now');
+        return db.makeEntries(entries);
+      }).then((eids) => {
+        entries = entries.map((ele, i) => {
+          ele.id = eids[i];
+          return ele;
+        });
+        return db.getAllEntriesForUser(uid, false);
+      }).then(result => {
+        assert.deepEqual(result.sort((a,b)=> {return a.datetime>b.datetime}), entries.sort((a,b)=> {return a.datetime>b.datetime}));
+        done();
+      });
+    });
+
+    it('can fetch all entries of a single user as entryids', done => {
+      var uid;
+      var entries = [];
+      r.tableCreate('users').run().then(() => {
+        return r.tableCreate('entries').run();
+      }).then(() => {
+        return db.makeUser('test', 'te', 'st', '123013j');
+      }).then(id => {
+        uid = id;
+        entries[0] = makeEntryObj(uid, 0123123123, 'diary text');
+        entries[1] = makeEntryObj(uid, 0189787778, 'a;lsdkfjadsf');
+        entries[2] = makeEntryObj(uid, 0129769769, 'this is life now');
+        return db.makeEntries(entries);
+      }).then((eids) => {
+        entries = eids;
+        return db.getAllEntriesForUser(uid, true);
+      }).then(result => {
+        assert.deepEqual(result.sort(), entries.sort());
+        done();
+      });
+    });
+
+    it.skip('can fetch x entries from entry y for a single user (+ve)', done => {
+      var uid;
+      var entries = [];
+      r.tableCreate('users').run().then(() => {
+        return r.tableCreate('entries').run();
+      }).then(() => {
+        return db.makeUser('test', 'te', 'st', '123013j');
+      }).then(id => {
+        uid = id;
+        entries[0] = makeEntryObj(uid, 1400000000, 'one');
+        entries[1] = makeEntryObj(uid, 1400000022, 'two');
+        entries[2] = makeEntryObj(uid, 1400000044, 'three');
+        entries[3] = makeEntryObj(uid, 1400000123, 'four');
+        entries[4] = makeEntryObj(uid, 1400000222, 'five');
+        return db.makeEntries(entries);
+      }).then(eids => {
+        entries = entries.map((e, i) => {e.id = eids[i]; return e;});
+        return db.getXEntriesFromEntry(uid, eids[2], 3);
+      }).then(result => {
+        assert.deepEqual(result, [entries[2], entries[3], entries[4]]);
+        done();
+      });
+    });
+
+    it.skip('can fetch x entries from entry y for a single user (-ve)', done => {
+      var uid;
+      var entries = [];
+      r.tableCreate('users').run().then(() => {
+        return r.tableCreate('entries').run();
+      }).then(() => {
+        return db.makeUser('test', 'te', 'st', '123013j');
+      }).then(id => {
+        uid = id;
+        entries[0] = makeEntryObj(uid, 1400000000, 'one');
+        entries[1] = makeEntryObj(uid, 1400000022, 'two');
+        entries[2] = makeEntryObj(uid, 1400000044, 'three');
+        entries[3] = makeEntryObj(uid, 1400000123, 'four');
+        entries[4] = makeEntryObj(uid, 1400000222, 'five');
+        return db.makeEntries(entries);
+      }).then(eids => {
+        entries = entries.map((e, i) => {e.id = eids[i]; return e;});
+        return db.getXEntriesFromEntry(uid, eids[3], -3);
+      }).then(result => {
+        assert.deepEqual(result, [entries[3], entries[2], entries[1]]);
+        done();
+      });
+    });
   });
 });
 

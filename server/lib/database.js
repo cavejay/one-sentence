@@ -10,7 +10,7 @@ var database = {};
 // Functions return a promise if there is no callback
 
 // user = {
-// 	 _id = unique user id, // filled by mongo
+// 	 id = unique user id, // filled by mongo
 //   name = [first, last],
 //   username = '',
 //   pwhash = '',
@@ -49,32 +49,99 @@ database.init = function () {
 /***************	User	***************/
 
 database.makeUser = function(username, first, last, pwhash, callback) {
-
+  if (callback == undefined) {
+    return r.table('users').insert({
+      username: username,
+      name: [first, last],
+      pwhash: pwhash
+    }).run().then((result) => {
+      return new Promise((resolve, reject) => {
+        resolve(result.generated_keys[0]);
+      });
+    });
+  } else {
+    r.table('users').insert({
+      username: username,
+      name: [first, last],
+      pwhash: pwhash
+    }).run().then((result) => {
+      callback(result.generated_keys[0]);
+    });
+  }
 }
 
 database.removeUser = function(user_uid, callback) {
-
+  if (callback == undefined) {
+    return r.table('users').get(user_uid).delete().run();
+  } else {
+    r.table('users').get(user_uid).delete().run().then(result => {
+      callback(result);
+    });
+  }
 }
 
-database.getUserSettings = function(user_uid, callback, reqData) {
-
+database.getUser = function(user_uid, callback, reqData) {
+  if (callback == undefined) {
+    return r.table('users').get(user_uid).run();
+  } else {
+    r.table('users').get(user_uid).run().then((result) => {
+      callback(result);
+    });
+  }
 }
 
-database.updateUserSettings = function(user_uid, user_settings, callback) {
+database.updateUser = function(user_uid, user_data, callback) {
+  if (callback == undefined) {
+    return r.table('users').get(user_uid).update(user_data)
+    .run().then((result) => {
+      return new Promise((resolve, reject) => {
+        resolve(user_uid); // todo return full updated object
+      });
+    });
+  } else {
+    r.table('users').get(user_uid).update(user_data).run().then(() => {
+      callback(user_uid);
+    });
 
+  }
 }
 
 database.getAllEntriesForUser = function(uid, onlyIds, callback) {
-
+  var query = r.table('entries').filter({uid: uid});
+  if (onlyIds) {
+    if (callback == undefined) {
+      return r.table('entries').filter({uid: uid}).getField('id').run();
+    } else {
+      r.table('entries').filter({uid: uid}).getField('id').run()
+      .then(result => {
+        callback(result);
+      });
+    }
+  } else {
+    if (callback == undefined) {
+      return r.table('entries').filter({uid: uid}).run();
+    } else {
+      r.table('entries').filter({uid: uid}).run().then(result => {
+        callback(result);
+      });
+    }
+  }
 }
 
-database.getEntriesFromEntry = function(uid, start_eid, num, callback) {
-
-};
-
-database.getXEntriesByUser = function(uid, eid, number, callback) {
-
-};
+/**
+ * -ve num means backwards in time, +ve num goes forwards.
+ */
+// database.getXEntriesFromEntry = function(uid, start_eid, num, callback) {
+//   if(callback == undefined) {
+//     return r.table('entries').orderBy('datetime')
+//   } else {
+//
+//   }
+// };
+//
+// database.getXEntriesByUser = function(uid, number, callback) {
+//
+// };
 
 // callback is passed true or false depending on whether the user exists.
 database.checkForUser = function(user_uid, callback, data) {
@@ -82,7 +149,7 @@ database.checkForUser = function(user_uid, callback, data) {
 }
 
 // entry = {
-//   eid: '',
+//   id: '',
 //   uid: '',
 //   datetime: '',
 // 	 text: '',
@@ -143,6 +210,20 @@ database.updateEntry = function(entryid, entry_object, callback) {
     }).then(() => {
       callback(next);
     });
+  }
+}
+
+database.makeEntries = function(entry_array, callback) {
+  if (callback == undefined) {
+    return r.table('entries').insert(entry_array).run().then(result => {
+      return new Promise(function(resolve, reject) {
+        resolve(result.generated_keys);
+      })
+    });
+  } else {
+    r.table('entries').insert(entry_array).run().then(result => {
+      callback(result.generated_keys);
+    })
   }
 }
 

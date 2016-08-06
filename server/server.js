@@ -28,6 +28,10 @@ var logged_in = {};
 // Make a new diary entry
 server.post('/diaryentry/user/:uid/create', function(req, res, next) {
 	console.log('[API] recieved a new entry for %s', req.params.uid);
+  // Check session of user
+  // validate body of message
+  // make new entry
+  // return response
 	res.send(200, "received a new diary entry for " + req.params.uid);
 	return next();
 });

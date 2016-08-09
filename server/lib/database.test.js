@@ -1,7 +1,7 @@
 // For testing
 var r = require('rethinkdbdash')();
 var db = require('./database');
-var assert = require('assert');
+var assert = require('chai').assert;
 they = it;
 
 var cleanTables = () => {
@@ -41,7 +41,7 @@ afterEach(function (done) {
   });
 })
 
-describe('Basic db test -- ', function () {
+describe('-- Basic db test -- ', function () {
   it('can store documents', (done) => {
     r.table('test')
       .insert({
@@ -86,7 +86,7 @@ describe('Basic db test -- ', function () {
   });
 });
 
-describe('db initialiasation -- ', function () {
+describe('-- db initialiasation -- ', function () {
   it('creates correct tables', done => {
     var expected = ['users', 'entries', 'test']; // TODO this shouldn't include test
     db.init().then(function () {
@@ -124,7 +124,23 @@ describe('db initialiasation -- ', function () {
   });
 });
 
-describe('Users Endpoints -- ', function () {
+describe('-- Login Helper --', function () {
+  it('can check if a user exists', done => {
+    r.tableCreate('users').run().then(() => {
+      return db.makeUser('test', 'te', 'st', '12312jjsf');
+    }).then(id => {
+      return db.checkForUser(id);
+    }).then(result => {
+      assert.isTrue(result);
+      return db.checkForUser('testinglol');
+    }).then(result => {
+      assert.isNotTrue(result);
+      done();
+    });
+  });
+});
+
+describe('-- Users Endpoints -- ', function () {
   var ex = {
     name: ['First', 'last'],
     username: 'user1',
@@ -298,7 +314,7 @@ describe('Users Endpoints -- ', function () {
   });
 });
 
-describe('Diary Entry Endpoints --', function () {
+describe('-- Diary Entry Endpoints --', function () {
   var test_uid = '000231-1231230';
 
   describe('The entry creation endpoint:', function () {

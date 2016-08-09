@@ -23,13 +23,47 @@ function send(req, res, next) {
 
 var logged_in = {};
 
+/***************		Login Checker		***************/
+
+server.use(function(req, res, next) {
+  var session = logged_in[req.header('session-token')];
+
+  // Check if we have a session
+  if (session == undefined) {
+    // if we don't have a session then check for the user
+    db.checkForUser(req.header('uid')).then(userExists => {
+      if (userExists) {
+        console.log('[SESSION] new user session started for ', req.header('uid'));
+        make_session(req.header('uid'));
+        return next();
+      } else {
+        console.log('[SESSION] unknown user %s attempted to use the service', req.header('uid'));
+        res.send(401, "User not found");
+        return next(false);
+      }
+    });
+  } else if (getSessionExpiry(session) > new Date.getTime()) {
+    // User has an old session and needs to generate a new one
+    db.verifyUser(req.header('uid')).then(res => { // todo make this a log in?
+      if (res) {
+        make_session(req.header('uid'))
+        return next();
+      } else {
+        res.send(401, 'Password incorrect'); // xxx this wont happen ever atm
+        return next(false);
+      }
+    });
+  } else {
+    // we have a current, valid session
+    return next();
+  }
+});
+
 /*************** 		Singular Diary Entry		***************/
 
 // Make a new diary entry
 server.post('/diaryentry/user/:uid/create', function(req, res, next) {
 	console.log('[API] recieved a new entry for %s', req.params.uid);
-  // Check session of user
-  // validate body of message
   // make new entry
   // return response
 	res.send(200, "received a new diary entry for " + req.params.uid);
@@ -94,9 +128,17 @@ server.get('/hello', function create(req, res, next) {
 /***************		Utility Functions		***************/
 
 var make_session = function(uid) {
+  var expirytime = new Date().getTime() + 30*60*60;
 	var sessionID = Math.floor((Math.random() * 100 * Math.random() * 1927473824) + 1);
+  sessionID = ((sessionID << 15 + expirytime) * 31 + 1201) * 7;
   // http://security.stackexchange.com/questions/24850/choosing-a-session-id-algorithm-for-a-client-server-relationship
   logged_in[uid] = sessionID;
 	logged_in[sessionID] = uid;
   return sessionID;
+}
+
+var getSessionExpiry = function(uid) {
+  var sessionID = logged_in[uid];
+  sessionID = ((sessionID/7) - 1201)/31;
+  return sessionID && 32767;
 }

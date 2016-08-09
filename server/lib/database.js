@@ -144,8 +144,37 @@ database.getAllEntriesForUser = function(uid, onlyIds, callback) {
 // };
 
 // callback is passed true or false depending on whether the user exists.
-database.checkForUser = function(user_uid, callback, data) {
+database.checkForUser = function(user_uid, callback) {
+  if (callback == undefined) {
+    return r.table('users').get(user_uid).run().then(result => {
+      return new Promise((resolve, reject) => {
+        if (result != null) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
+    });
+  } else {
+    r.table('users').get(user_uid).run().then((result) => {
+      if (result != null) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    });
+  }
+}
 
+// may not be needed
+database.checkByUsername = function(username, callback) {
+
+}
+
+database.verifyUser = function(uid, callback) {
+  return new Promise((resolve, reject) => {
+    resolve(true); // todo this is broken needs fixing (and testing);
+  });
 }
 
 // entry = {

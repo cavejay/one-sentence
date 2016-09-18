@@ -16,6 +16,7 @@ describe('-- User accounts --', function () {
       db.init().then(() => {
         request(app)
         .post('/user/new')
+        .set('pw', require('./pw'))
         .expect(200)
         .end((err, res) => {
           if (err) return done(err);

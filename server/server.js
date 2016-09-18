@@ -25,6 +25,14 @@ function send (req, res, next) {
 var logged_in = {};
 
 /***************		Login Checker		***************/
+
+server.use(function (req, res, next) {
+  if (req.header('pw') != require('./pw')) {
+    res.send(400, 'Password incorrect');
+    return next(false);
+  }
+  return next();
+});
 /*
 server.use(function (req, res, next) {
   var session = logged_in[req.header('session-token')];

@@ -1,4 +1,5 @@
 var r = require('rethinkdbdash')();
+var log = require('./log.js');
 var database = {};
 
 // callback = function(data) {}
@@ -27,18 +28,18 @@ database.init = function () {
   // a simple temp function
   var makeEntriesTable = function (tables) {
     if (tables.indexOf('entries') < 0) {
-      console.log('[DATABASE] No \'entries\' table');
+      log.database('No \'entries\' table');
       return r.tableCreate('entries').run().then(() => {
-        console.log('[DATABASE] Created \'entries\' table');
+        log.database('Created \'entries\' table');
       });
     }
   }
 
   return r.tableList().run().then(tables => {
     if (tables.indexOf('users') < 0) {
-      console.log('[DATABASE] No \'users\' table');
+      log.database('No \'users\' table');
       return r.tableCreate('users').run().then(() => {
-        console.log('[DATABASE] Created \'users\' table');
+        log.database('Created \'users\' table');
         return makeEntriesTable(tables);
       });
     } // else make an entries table

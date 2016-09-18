@@ -2,44 +2,11 @@
 var r = require('rethinkdbdash')();
 var db = require('./database');
 var assert = require('chai').assert;
-they = it;
+var utils = require('./testUtils');
 
-var cleanTables = () => {
-  var t = function (a) {
-    if (a.length > 1) {
-      return r.tableDrop(a.shift()).run().then(() => {
-        return t(a);
-      });
-    } else if (a.length == 1) {
-      return r.tableDrop(a.shift()).run();
-    } else {
-      return r.tableList().run();
-    }
-  };
+beforeEach(utils.beforeEach);
 
-  return r.tableList().run().then(tables => {
-    return t(tables);
-  });
-}
-
-beforeEach(function (done) {
-  r.tableList().run().then(result => {
-    if (result.length > 0) {
-      console.log('There are uncleaned Tables: ', result);
-    }
-    return cleanTables();
-  }).then(() => {
-    return r.tableCreate('test').run();
-  }).then(result => {
-    done();
-  });
-});
-
-afterEach(function (done) {
-  cleanTables().then(() => {
-    done();
-  });
-})
+afterEach(utils.afterEach);
 
 describe('-- Basic db test -- ', function () {
   it('can store documents', (done) => {

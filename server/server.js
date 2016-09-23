@@ -28,8 +28,8 @@ var logged_in = {};
 
 server.use(function (req, res, next) {
   if (req.header('pw') != require('./pw')) {
-    res.send(400, 'Password incorrect');
-    return next(false);
+    res.send(403, 'Password incorrect');
+    return next(new restify.ForbiddenError("You didn't enter the password :("));
   }
   return next();
 });
@@ -120,6 +120,18 @@ server.post('/user/new', function (req, res, next) {
   log.api('create a new user called %s', req.params.suggestedusername);
 
   res.send(200, "received a request to make a new user called" + req.params.suggestedusername);
+  return next();
+});
+
+server.get('/user/check', function (req, res, next) {
+  log.api('Check for user called %s', req.header('username'));
+  if (req.header('username') === undefined) {
+    return next(new restify.BadRequestError("A 'username' header is required for this endpoint"));
+  }
+  db.checkForUser(req.header('username')).then(userExists => {
+    res.header('exists', userExists);
+    res.send(200);
+  });
   return next();
 });
 

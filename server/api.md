@@ -9,11 +9,56 @@
 
 ### Create User
 
+  `POST /user/new`
+
+  **Request**
+  ```
+  {
+    xContent-Type: 'application/json',
+    username: 'cavejay',
+    pw: 'ThisIsPassword12,
+    email: 'HI@hi.com',
+    name: 'Michael X'
+  }
+  ```
+
+  **Response**
+  ```
+  Accepted: {
+    uid: '12312sada-1231asd-1123asd-123141'
+  }
+
+  Denied: {
+    reason: 'Username already taken'
+  }
+  ```
+  Used to create a new user and receive your uid to actually start making calls.
+  Use `/user/check` before running this to ensure the username is available.
+
 ### Update User
 
 ### Remove User
 
 ### Fetch User
+
+### Check User
+
+  `GET /user/check`
+
+  **Request**
+  ```
+  {
+    xContent-Type: 'application/json',
+    username: 'cavejay'
+  }
+  ```
+
+  **Response**
+  ```
+  {
+    exists: true
+  }
+  ```
 
 ## Diary Endpoints ##
 ---

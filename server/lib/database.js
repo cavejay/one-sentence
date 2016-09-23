@@ -1,6 +1,7 @@
 var r = require('rethinkdbdash')();
 var log = require('./log.js');
 var database = {};
+database.r = r;
 
 // callback = function(data) {}
 // callback = function(data, error) {}
@@ -167,9 +168,26 @@ database.checkForUser = function(user_uid, callback) {
   }
 }
 
-// may not be needed
 database.checkByUsername = function(username, callback) {
-
+  if (callback == undefined) {
+    return r.table('users').filter({username: username}).run().then(result => {
+      return new Promise((resolve, reject) => {
+        if (result.length > 0) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
+    });
+  } else {
+    r.table('users').filter({username: username}).run().then(result => {
+      if (result.length > 0) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    });
+  }
 }
 
 database.verifyUser = function(uid, callback) {

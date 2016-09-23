@@ -1,27 +1,91 @@
-var make_session = require('./server').testing.make_session;
-var getSessionExpiry = require('./server').testing.getSessionExpiry;
-var getLoggedIn = require('./server').testing.logged_in;
 var db = require('./lib/database');
-var app = require('./server').testing.server;
-var assert = require('chai').assert;
+var expect = require('chai').expect;
 var request = require('supertest');
 var utils = require('./lib/testUtils');
 
-describe('-- User accounts --', function () {
-  describe('/user/new', function () {
-    before(utils.beforeEach);
-    after(utils.afterEach);
+var make_session = require('./server').testing.make_session;
+var getSessionExpiry = require('./server').testing.getSessionExpiry;
+var getLoggedIn = require('./server').testing.logged_in;
+var app = require('./server').testing.server;
 
-    it('creates a user successfully', (done) => {
-      db.init().then(() => {
+
+describe('-- User accounts --', function () {
+  before(utils.beforeEach);
+  after(utils.afterEach);
+
+  describe('user/check', function () {
+    var user1 = {username: 'tester1', first: 'First', last: 'Last', pwhash: 'pwlol95'};
+    it('requires athentification', (done) => { // This might need some re-work?
+      request(app)
+        .get('/user/check')
+        .expect(403, done);
+    });
+
+    it('reports correctly if the user exists', (done) => {
+      db.r.tableCreate('users').run().then(() => {
+          return db.makeUser(user1.username, user1.first, user1.last, user1.pwhash);
+      }).then(() => {
         request(app)
-        .post('/user/new')
+          .get('/user/check')
+          .set('pw', require('./pw'))
+          .set('username', 'tester1')
+          .expect(200)
+          .expect('exists', 'false')
+          .end((err, res) => {
+            if (err) return done(err);
+            return done();
+          });
+      });
+    });
+
+    it('reports correctly if a user doesn\'t exist', (done) => {
+      db.r.tableCreate('users').run().then(() => {
+        request(app)
+        .get('/user/check')
         .set('pw', require('./pw'))
+        .set('username', 'testerNotThere')
         .expect(200)
+        .expect('exists', 'false')
         .end((err, res) => {
           if (err) return done(err);
-          done();
+          return done();
         });
+      });
+    });
+
+    it('reports correctly when used with malformed data', (done) => {
+      db.r.tableCreate('users').run().then(() => {
+        request(app)
+          .get('/user/check')
+          .set('pw', require('./pw'))
+          .send({username: 213213, name: 'tester1'})
+          .expect(400)
+          .end((err, res) => {
+            if (err) return done(err);
+            return done();
+          });
+      });
+    });
+  });
+
+  describe('/user/new', function () {
+    it('creates a user successfully', (done) => {
+      db.r.tableCreate('users').run().then(() => {
+        request(app)
+          .post('/user/new')
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            username: 'cavejay',
+            pw: 'ThisIsPassword12',
+            email: 'HI@hi.com',
+            name: 'Michael X'
+          })
+          .expect(200)
+          .end((err, res) => {
+            if (err) return done(err);
+            return done();
+          });
       });
     });
     it('returns the correct response');
@@ -43,7 +107,7 @@ describe('-- helper functions --', function () {
   describe('make_session', function () {
     it('correctly stores a sessionID and uid', () => {
       make_session('hi');
-      assert.notEqual(getLoggedIn()['hi'], undefined, 'array contains value');
+      expect(getLoggedIn()['hi'], 'array contains value').to.not.equal(undefined);
     });
   });
 

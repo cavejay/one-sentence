@@ -53,7 +53,7 @@ describe('-- Basic db test -- ', function () {
   });
 });
 
-describe('-- db initialiasation -- ', function () {
+describe('-- db initialisation -- ', function () {
   it('creates correct tables', done => {
     var expected = ['users', 'entries', 'test']; // TODO this shouldn't include test
     db.init().then(function () {
@@ -92,7 +92,7 @@ describe('-- db initialiasation -- ', function () {
 });
 
 describe('-- Login Helper --', function () {
-  it('can check if a user exists', done => {
+  it('can check if a user exists by uid', done => {
     r.tableCreate('users').run().then(() => {
       return db.makeUser('test', 'te', 'st', '12312jjsf');
     }).then(id => {
@@ -104,6 +104,20 @@ describe('-- Login Helper --', function () {
       assert.isNotTrue(result);
       done();
     });
+  });
+
+  it('can check for users by username', done => {
+    r.tableCreate('users').run().then(() => {
+      return db.makeUser('username007', 'he', 'man', '123jaldk23;123');
+    }).then(() => {
+      return db.checkByUsername('user2');
+    }).then(result => {
+      assert.isFalse(result);
+      return db.checkByUsername('username007');
+    }).then(result => {
+      assert.isTrue(result);
+      done();
+    })
   });
 });
 

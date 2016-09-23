@@ -28,7 +28,7 @@ log.session = function (str) {
 }
 
 log.info = function (str) {
-  base('[INFO]', arguments);
+  base('[INFO] ', arguments);
 }
 
 log.a = function (str) {

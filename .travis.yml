@@ -8,3 +8,4 @@ addons:
 
 before_script:
   - cd server
+  - npm install

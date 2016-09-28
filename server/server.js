@@ -2,6 +2,7 @@ var restify = require('restify'),
 		fs 			= require('fs'), // needed for cert and key of server (if https)
 		db 	= require('./lib/database.js');
     log = require('./lib/log.js');
+    checks = require('./lib/checks.js');
 
 var server = restify.createServer({
 	// certificate: fs.readFileSync('path/to/cert'),
@@ -10,6 +11,7 @@ var server = restify.createServer({
 });
 
 server.use(restify.acceptParser(server.acceptable));
+server.use(restify.bodyParser());
 
 server.listen(9090, function () {
 	log.a('%s listening at %s', server.name, server.url);
@@ -117,10 +119,19 @@ server.del('/diaryentry/user/:uid/remove/:entryid', function (req, res, next) {
 
 // Make a new user
 server.post('/user/new', function (req, res, next) {
-  log.api('create a new user called %s', req.params.suggestedusername);
-
-  res.send(200, "received a request to make a new user called" + req.params.suggestedusername);
-  return next();
+  log.api('create a new user called %s', req.params.username);
+  db.checkByUsername(req.params.username).then(isTaken => {
+    if (isTaken) {
+      return next(new restify.ForbiddenError('Username already exists'));
+    } else if (!checks.checkUsernameValidity(req.params.username)) {
+      return next(new restify.ForbiddenError('Username is invalid'));
+    }
+    var first = req.params.name.split(' ')[0];
+    var last =  req.params.name.split(' ')[1];
+    db.makeUser(req.params.username, first, last, req.params.pwhash).then(uid => {
+      return res.send(200, {'uid': uid})
+    });
+  });
 });
 
 server.get('/user/check', function (req, res, next) {

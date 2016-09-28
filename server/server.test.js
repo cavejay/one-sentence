@@ -10,10 +10,10 @@ var app = require('./server').testing.server;
 
 
 describe('-- User accounts --', function () {
-  before(utils.beforeEach);
-  after(utils.afterEach);
-
   describe('user/check', function () {
+    before(utils.beforeEach);
+    after(utils.afterEach);
+
     var user1 = {username: 'tester1', first: 'First', last: 'Last', pwhash: 'pwlol95'};
     it('requires athentification', (done) => { // This might need some re-work?
       request(app)
@@ -33,6 +33,7 @@ describe('-- User accounts --', function () {
           .expect('exists', 'false')
           .end((err, res) => {
             if (err) return done(err);
+            expect(res.body).to.be.empty;
             return done();
           });
       });
@@ -48,6 +49,7 @@ describe('-- User accounts --', function () {
         .expect('exists', 'false')
         .end((err, res) => {
           if (err) return done(err);
+          expect(res.body).to.be.empty;
           return done();
         });
       });
@@ -62,14 +64,18 @@ describe('-- User accounts --', function () {
           .expect(400)
           .end((err, res) => {
             if (err) return done(err);
+            expect(res.body.message).to.equal('A \'username\' header is required for this endpoint');
             return done();
           });
       });
     });
   });
 
-  describe('/user/new', function () {
-    it('creates a user successfully', (done) => {
+  describe.only('/user/new', function () {
+    before(utils.beforeEach);
+    after(utils.afterEach);
+
+    it('creates a user successfully', done => {
       db.r.tableCreate('users').run().then(() => {
         request(app)
           .post('/user/new')
@@ -84,11 +90,15 @@ describe('-- User accounts --', function () {
           .expect(200)
           .end((err, res) => {
             if (err) return done(err);
-            return done();
+            if (res.body.uid === undefined) return;
+            db.checkForUser(res.body.uid).then(result => {
+              expect(result).to.be.true;
+              return done();
+            });
           });
       });
     });
-    it('returns the correct response');
+    it('returns the correct responses');
     it('doesn\'t allow creation of duplicate users');
     it('doesn\'t allow creation of invalid usernames');
   })

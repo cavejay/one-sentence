@@ -24,13 +24,14 @@
 
   **Response**
   ```
-  Accepted: {
-    uid: '12312sada-1231asd-1123asd-123141'
-  }
+  Accepted:
+    {uid: '12312sada-1231asd-1123asd-123141'}
 
-  Denied: {
-    reason: 'Username already taken'
-  }
+  Denied: 403
+    reason: 'Username already exists'
+
+  Denied: 403
+    reason: 'Username is invalid'
   ```
   Used to create a new user and receive your uid to actually start making calls.
   Use `/user/check` before running this to ensure the username is available.
@@ -47,18 +48,14 @@
 
   **Request**
   ```
-  {
-    xContent-Type: 'application/json',
     username: 'cavejay'
-  }
   ```
 
   **Response**
   ```
-  {
     exists: true
-  }
   ```
+Done entirely in headers and doesn't require any actual body processing.
 
 ## Diary Endpoints ##
 ---

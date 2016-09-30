@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "promise": "^7.0.4",
+    "restify": "^4.1.1",
     "rethinkdbdash": "^2.3.17"
   },
   "devDependencies": {

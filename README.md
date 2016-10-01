@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/cavejay/one-sentence.svg?branch=server)](https://travis-ci.org/cavejay/one-sentence)
 # one-sentence
 A easy to use implementation for a '1 sentence diary' that uses telegram and node to store sentences in a mongoDB
 

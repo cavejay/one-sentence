@@ -129,7 +129,7 @@ server.post('/user/new', function (req, res, next) {
     var first = req.params.name.split(' ')[0];
     var last =  req.params.name.split(' ')[1];
     db.makeUser(req.params.username, first, last, req.params.pwhash).then(uid => {
-      return res.send(200, {'uid': uid})
+      return res.send(200, {'uid': uid});
     });
   });
 });

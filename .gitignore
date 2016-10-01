@@ -33,4 +33,3 @@ mongoKey.js
 tmp
 
 rethinkdb_data
-server/pw.js

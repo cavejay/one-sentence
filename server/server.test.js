@@ -71,7 +71,7 @@ describe('-- User accounts --', function () {
     });
   });
 
-  describe.only('/user/new', function () {
+  describe('/user/new', function () {
     before(utils.beforeEach);
     after(utils.afterEach);
 

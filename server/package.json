@@ -4,7 +4,7 @@
   "description": "Handles rest APIs and db calls",
   "main": "server.js",
   "scripts": {
-    "test": "find . -name '*.test.js' | xargs node_modules/.bin/mocha"
+    "test": "find . -name '*.test.js' | grep -v node_modules | xargs node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",

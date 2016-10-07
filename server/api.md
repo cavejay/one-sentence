@@ -28,10 +28,17 @@
     {uid: '12312sada-1231asd-1123asd-123141'}
 
   Denied: 403
-    reason: 'Username already exists'
+    {code: 'ForbiddenError', message: 'Username already exists'}
 
   Denied: 403
-    reason: 'Username is invalid'
+    {code: 'ForbiddenError', message: 'Username is invalid '}
+
+  Denied: 403
+    {code: 'ForbiddenError', message: 'Password doesn't meet requirements'}
+
+  Denied: 403
+    {code: 'ForbiddenError', message: 'Email is invalid'}
+
   ```
   Used to create a new user and receive your uid to actually start making calls.
   Use `/user/check` before running this to ensure the username is available.

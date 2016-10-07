@@ -126,6 +126,12 @@ server.post('/user/new', function (req, res, next) {
     } else if (!checks.checkUsernameValidity(req.params.username)) {
       return next(new restify.ForbiddenError('Username is invalid'));
     }
+    if (!checks.checkPasswordValidity(req.params.pw)) {
+      return next(new restify.ForbiddenError('Password doesn\'t meet requirements'));
+    }
+    if (!checks.checkEmailValidity(req.params.email)) {
+      return next(new restify.ForbiddenError('Email is invalid'));
+    }
     var first = req.params.name.split(' ')[0];
     var last =  req.params.name.split(' ')[1];
     db.makeUser(req.params.username, first, last, req.params.pwhash).then(uid => {

@@ -9,7 +9,7 @@ var getLoggedIn = require('./server').testing.logged_in;
 var app = require('./server').testing.server;
 
 
-describe('-- User accounts --', function () {
+describe.only('-- User accounts --', function () {
   describe('user/check', function () {
     before(utils.beforeEach);
     after(utils.afterEach);
@@ -98,10 +98,115 @@ describe('-- User accounts --', function () {
           });
       });
     });
-    it('returns the correct responses');
-    it('doesn\'t allow creation of duplicate users');
-    it('doesn\'t allow creation of invalid usernames');
-  })
+
+    it('doesn\'t allow creation of duplicate users', done => {
+      db.r.tableCreate('users').run().then(() => {
+        request(app)
+          .post('/user/new')
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            username: 'cavejay',
+            pw: 'ThisIsPassword12',
+            email: 'HI@hi.com',
+            name: 'Michael X'
+          })
+          .expect(200)
+          .end((err, res) => {
+            if (err) return done(err);
+
+            // Make a new request for the same user
+            request(app)
+              .post('/user/new')
+              .set('pw', require('./pw'))
+              .set('Accept', 'application/json')
+              .send({
+                username: 'cavejay',
+                pw: 'ThisIsPassword12',
+                email: 'HI@hi.com',
+                name: 'Michael X'
+              })
+              .expect(403)
+              .end((err2, res2) => {
+                if (err2) return done(err2);
+                if (res2.body.code == 'ForbiddenError' &&
+                    res2.body.message == 'Username already exists') {
+                  done();
+                }
+              });
+          });
+      });
+    });
+
+    it('catches invalid emails', done => {
+      db.r.tableCreate('users').run().then(() => {
+        request(app)
+          .post('/user/new')
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            username: 'cavejay',
+            pw: 'ThisIsPassword12',
+            email: 'HIcom',
+            name: 'Michael X'
+          })
+          .expect(403)
+          .end((err, res) => {
+            if (err) return done(err);
+            if (res.body.code == 'ForbiddenError' &&
+                res.body.message == 'Email is invalid') {
+              done();
+            }
+          });
+      });
+    });
+
+    it('catches inadequate passwords', done => {
+      db.r.tableCreate('users').run().then(() => {
+        request(app)
+          .post('/user/new')
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            username: 'cavejay',
+            pw: 'adf dsaf adsf',
+            email: 'HI@hi.com',
+            name: 'Michael X'
+          })
+          .expect(403)
+          .end((err, res) => {
+            if (err) return done(err);
+            if (res.body.code == 'ForbiddenError' &&
+                res.body.message == 'Password doesn\'t meet requirements') {
+              done();
+            }
+          });
+      });
+    });
+
+    it('catches invalid usernames', done => {
+      db.r.tableCreate('users').run().then(() => {
+        request(app)
+          .post('/user/new')
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            username: 'cavejay !@#?~',
+            pw: 'ThisIsPassword12',
+            email: 'HI@hi.com',
+            name: 'Michael X'
+          })
+          .expect(403)
+          .end((err, res) => {
+            if (err) return done(err);
+            if (res.body.code == 'ForbiddenError' &&
+                res.body.message == 'Username is invalid') {
+              done();
+            }
+          });
+      });
+    });
+  });
 });
 
 describe('-- User Diary Entries --', function () {

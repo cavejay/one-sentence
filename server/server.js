@@ -130,7 +130,7 @@ server.post('/user/new', function (req, res, next) {
       return next(new restify.ForbiddenError('Password doesn\'t meet requirements'));
     }
     if (!checks.checkEmailValidity(req.params.email)) {
-      return next(new restify.ForbiddenError('Email is invalid'));
+      return next(new restify.ForbiddenError('Email is invaliddf'));
     }
     var first = req.params.name.split(' ')[0];
     var last =  req.params.name.split(' ')[1];

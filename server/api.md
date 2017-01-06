@@ -38,12 +38,13 @@
 
   Denied: 403
     {code: 'ForbiddenError', message: 'Email is invalid'}
-
   ```
   Used to create a new user and receive your uid to actually start making calls.
   Use `/user/check` before running this to ensure the username is available.
 
 ### Update User
+
+  `PUT /user/:uid`
 
 ### Remove User
 

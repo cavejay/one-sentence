@@ -207,6 +207,10 @@ describe.only('-- User accounts --', function () {
       });
     });
   });
+
+  describe('/user/update');
+  describe('/user/delete');
+  describe('/user/')
 });
 
 describe('-- User Diary Entries --', function () {

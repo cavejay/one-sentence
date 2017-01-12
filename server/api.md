@@ -93,17 +93,25 @@
 
 **Request**
   ```
+    pw: password123
   ```
 
   **Response**
   ```
+    Accepted: 200
+
+    Denied:
+      {code: '', message: "A 'pw' header is required for this endpoint"}
+
+    Denied:
+      {code: '', message: 'Bad username or password'}
   ```
 
   **Requirements**
-  - 
+  - the user's hashed pw in the pw header
 
-  Used to delete a user's various information.
-  Use `/user/check` before running this to ensure the username is available.
+  Used to delete a user's entire account and information.
+  There is no going back from running this command and so it should be guarded quite heavily.
 
 ### Fetch User
 

@@ -9,7 +9,7 @@ var getLoggedIn = require('./server').testing.logged_in;
 var app = require('./server').testing.server;
 
 
-describe.only('-- User accounts --', function () {
+describe('-- User accounts --', function () {
   describe('user/check', function () {
     before(utils.beforeEach);
     after(utils.afterEach);
@@ -208,9 +208,9 @@ describe.only('-- User accounts --', function () {
     });
   });
 
-  describe('/user/update');
-  describe('/user/delete');
-  describe('/user/')
+  // describe('/user/update');
+  // describe('/user/delete');
+  // describe('/user/');
 });
 
 describe('-- User Diary Entries --', function () {

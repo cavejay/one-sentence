@@ -31,8 +31,8 @@ var logged_in = {};
 
 server.use(function (req, res, next) {
   if (req.header('pw') != require('./pw')) {
-    res.send(403, 'Password incorrect');
-    return next(new restify.ForbiddenError("You didn't enter the password :("));
+    // res.send(401, 'Password incorrect');
+    return next(new restify.UnauthorizedError("You didn't enter the password :("));
   }
   return next();
 });
@@ -123,20 +123,20 @@ server.post('/user/new', function (req, res, next) {
   log.api('create a new user called %s', req.params.username);
   db.checkByUsername(req.params.username).then(isTaken => {
     if (isTaken) {
-      return next(new restify.ForbiddenError('Username already exists'));
+      return next(new restify.UnprocessableEntityError('Username already exists'));
     } else if (!checks.checkUsernameValidity(req.params.username)) {
-      return next(new restify.ForbiddenError('Username is invalid'));
+      return next(new restify.UnprocessableEntityError('Username is invalid'));
     }
     if (!checks.checkPasswordValidity(req.params.pw)) {
-      return next(new restify.ForbiddenError('Password doesn\'t meet requirements'));
+      return next(new restify.UnprocessableEntityError('Password doesn\'t meet requirements'));
     }
     if (!checks.checkEmailValidity(req.params.email)) {
-      return next(new restify.ForbiddenError('Email is invalid'));
+      return next(new restify.UnprocessableEntityError('Email is invalid'));
     }
     var first = req.params.name.split(' ')[0];
     var last =  req.params.name.split(' ')[1];
     db.makeUser(req.params.username, first, last, req.params.pwhash).then(uid => {
-      return res.send(200, {'uid': uid});
+      return res.send(201, {'uid': uid});
     });
   });
 });

@@ -129,7 +129,7 @@ describe('-- User accounts --', function () {
               .expect(422)
               .end((err2, res2) => {
                 if (err2) return done(err2);
-                if (res2.body.code == 'ForbiddenError' &&
+                if (res2.body.code == 'UnprocessableEntityError' &&
                     res2.body.message == 'Username already exists') {
                   done();
                 }
@@ -153,7 +153,7 @@ describe('-- User accounts --', function () {
           .expect(422)
           .end((err, res) => {
             if (err) return done(err);
-            if (res.body.code == 'ForbiddenError' &&
+            if (res.body.code == 'UnprocessableEntityError' &&
                 res.body.message == 'Email is invalid') {
               done();
             }
@@ -176,7 +176,7 @@ describe('-- User accounts --', function () {
           .expect(422)
           .end((err, res) => {
             if (err) return done(err);
-            if (res.body.code == 'ForbiddenError' &&
+            if (res.body.code == 'UnprocessableEntityError' &&
                 res.body.message == 'Password doesn\'t meet requirements') {
               done();
             }
@@ -199,7 +199,7 @@ describe('-- User accounts --', function () {
           .expect(422)
           .end((err, res) => {
             if (err) return done(err);
-            if (res.body.code == 'ForbiddenError' &&
+            if (res.body.code == 'UnprocessableEntityError' &&
                 res.body.message == 'Username is invalid') {
               done();
             }
@@ -226,7 +226,9 @@ describe('-- User accounts --', function () {
     it('frees up the deleted users username for reuse');
   });
 
-  describe('/user/fetch/:uid')
+  // describe('/user/fetch/:uid', function () {
+
+  // });
 });
 
 describe('-- User Diary Entries --', function () {

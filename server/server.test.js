@@ -15,10 +15,10 @@ describe('-- User accounts --', function () {
     after(utils.afterEach);
 
     var user1 = {username: 'tester1', first: 'First', last: 'Last', pwhash: 'pwlol95'};
-    it('requires athentification', (done) => { // This might need some re-work?
+    it('requires athentication', (done) => { // This might need some re-work?
       request(app)
         .get('/user/check')
-        .expect(403, done);
+        .expect(401, done);
     });
 
     it('reports correctly if the user exists', (done) => {
@@ -87,7 +87,7 @@ describe('-- User accounts --', function () {
             email: 'HI@hi.com',
             name: 'Michael X'
           })
-          .expect(200)
+          .expect(201)
           .end((err, res) => {
             if (err) return done(err);
             if (res.body.uid === undefined) return;
@@ -111,7 +111,7 @@ describe('-- User accounts --', function () {
             email: 'HI@hi.com',
             name: 'Michael X'
           })
-          .expect(200)
+          .expect(201)
           .end((err, res) => {
             if (err) return done(err);
 
@@ -126,7 +126,7 @@ describe('-- User accounts --', function () {
                 email: 'HI@hi.com',
                 name: 'Michael X'
               })
-              .expect(403)
+              .expect(422)
               .end((err2, res2) => {
                 if (err2) return done(err2);
                 if (res2.body.code == 'ForbiddenError' &&
@@ -150,7 +150,7 @@ describe('-- User accounts --', function () {
             email: 'HIcom',
             name: 'Michael X'
           })
-          .expect(403)
+          .expect(422)
           .end((err, res) => {
             if (err) return done(err);
             if (res.body.code == 'ForbiddenError' &&
@@ -173,7 +173,7 @@ describe('-- User accounts --', function () {
             email: 'HI@hi.com',
             name: 'Michael X'
           })
-          .expect(403)
+          .expect(422)
           .end((err, res) => {
             if (err) return done(err);
             if (res.body.code == 'ForbiddenError' &&
@@ -184,7 +184,7 @@ describe('-- User accounts --', function () {
       });
     });
 
-    it('catches invalid usernames', done => {
+    it('catches invalid usernames 1', done => {
       db.r.tableCreate('users').run().then(() => {
         request(app)
           .post('/user/new')
@@ -196,7 +196,7 @@ describe('-- User accounts --', function () {
             email: 'HI@hi.com',
             name: 'Michael X'
           })
-          .expect(403)
+          .expect(422)
           .end((err, res) => {
             if (err) return done(err);
             if (res.body.code == 'ForbiddenError' &&
@@ -206,11 +206,27 @@ describe('-- User accounts --', function () {
           });
       });
     });
+    it('catches invalid usernames 2');
+    it('catches invalid usernames 3');
+    it('catches invalid usernames 4');
   });
 
-  // describe('/user/update');
-  // describe('/user/delete');
-  // describe('/user/');
+  describe('/user/update', function () {
+    it('doesn\'t update users that don\'t exist');
+    it('updates only the part of the user that\'s relevant');
+    it('catches invalid emails');
+    it('prevents changing of username');
+    it('doesn\'t add fields that shouldn\'t exist to the user');
+    it('doesn\'t change data when it something fails');
+  });
+
+  describe('/user/delete', function () {
+    it('removes the user info');
+    it('removes all of the user\'s entries from the database');
+    it('frees up the deleted users username for reuse');
+  });
+
+  describe('/user/fetch/:uid')
 });
 
 describe('-- User Diary Entries --', function () {

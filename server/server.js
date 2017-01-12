@@ -11,6 +11,7 @@ var server = restify.createServer({
 });
 
 server.use(restify.acceptParser(server.acceptable));
+server.use(restify.gzipResponse());
 server.use(restify.bodyParser());
 
 server.listen(9090, function () {
@@ -150,6 +151,10 @@ server.get('/user/check', function (req, res, next) {
     res.send(200);
   });
   return next();
+});
+
+server.put('/user/update/:uid', function (req, res, next) {
+  log.api('Update for user called %s', req.params.uid);
 });
 
 // login to a user

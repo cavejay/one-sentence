@@ -9,12 +9,12 @@
 
 ### Create User
 
-  `POST /user/new`
+> `POST /user/new`
 
   **Request**
   ```
+  xContent-Type: 'application/json'
   {
-    xContent-Type: 'application/json',
     username: 'cavejay',
     pw: 'ThisIsPassword12,
     email: 'HI@hi.com',
@@ -24,35 +24,92 @@
 
   **Response**
   ```
-  Accepted:
+  Accepted: 201
     {uid: '12312sada-1231asd-1123asd-123141'}
 
-  Denied: 403
-    {code: 'ForbiddenError', message: 'Username already exists'}
+  Denied: 422
+    {code: 'UnprocessableEntityError', message: 'Username already exists'}
 
-  Denied: 403
-    {code: 'ForbiddenError', message: 'Username is invalid '}
+  Denied: 422
+    {code: 'UnprocessableEntityError', message: 'Username is invalid '}
 
-  Denied: 403
-    {code: 'ForbiddenError', message: 'Password doesn't meet requirements'}
+  Denied: 422
+    {code: 'UnprocessableEntityError', message: 'Password doesn't meet requirements'}
 
-  Denied: 403
-    {code: 'ForbiddenError', message: 'Email is invalid'}
+  Denied: 422
+    {code: 'UnprocessableEntityError', message: 'Email is invalid'}
   ```
+  
+  **Requirements**
+  - Usernames must not have any spaces // TODO update to this: "be made of alphanumeric characters and any of the following: `-`, `_`."
+  - Passwords must not have any spaces // TODO update this and tests for v1
+  - Username must be unique
+  - Emails must have an `@` sign followed by something and then a `.`
+
   Used to create a new user and receive your uid to actually start making calls.
   Use `/user/check` before running this to ensure the username is available.
 
 ### Update User
 
-  `PUT /user/:uid`
+> `PUT /user/:uid`
+
+  **Request**
+  ```
+  xContent-Type: 'application/json'
+  {
+    pw | email | name: 'insert updated info here'
+  }
+  ```
+
+  **Response**
+  ```
+  Accepted: 204
+
+  Denied: 403
+    {code: 'ForbiddenError', message: 'Can't update username'}
+
+  Denied: 422
+    {code: 'UnprocessableEntityError', message: 'Username does not exist'}
+
+  Denied: 422
+    {code: 'UnprocessableEntityError', message: 'Bad email address'}
+
+  Denied: 422
+    {code: 'UnprocessableEntityError', message: 'Invalid Field'}
+  ```
+
+  **Requirements**
+  - A failed update doesn't not result in altered data
+  - Prevents updating to an invalid email
+  - Prevents updating of a username
+  - Prevents additional fields being added to the user
+
+  Used to update a user's various information.
+  Use `/user/check` before running this to ensure the username is available.
 
 ### Remove User
+
+> `DELETE /user/:uid`
+
+**Request**
+  ```
+  ```
+
+  **Response**
+  ```
+  ```
+
+  **Requirements**
+  - 
+
+  Used to delete a user's various information.
+  Use `/user/check` before running this to ensure the username is available.
 
 ### Fetch User
 
 ### Check User
 
-  `GET /user/check`
+> `GET /user/check`
 
   **Request**
   ```
@@ -61,9 +118,22 @@
 
   **Response**
   ```
-    exists: true
+  Accepted: 200
+    exists: boolean
+
+  Denied: 400
+    body: "A 'username' header is required for this endpoint"
+
+  Denied: 401
+    This will happen if you have no authentication
   ```
-Done entirely in headers and doesn't require any actual body processing.
+
+  **Requirements**
+  - the username header must exist and have content
+
+Allows a user to check if a username exists already. 
+Intended for use in sign-up forms and the like. 
+This end point is done entirely in headers and doesn't require any actual body processing.  
 
 ## Diary Endpoints ##
 ---

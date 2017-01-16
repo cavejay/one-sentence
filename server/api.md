@@ -1,11 +1,21 @@
 # Sentence Server API
 
+v0.0.1
+
 ## User Endpoints ##
 ---
 
 ### Login
 
 > `HEAD /login/:uid`
+
+  **Request**
+  // todo
+  **Response**
+
+  **Requirements**
+
+  What's used by people to recieve their initial token of authentication.
 
 ### Create User
 
@@ -64,6 +74,9 @@
   **Response**
   ```
   Accepted: 204
+    {
+      // The User's details
+    }
 
   Denied: 403
     {code: 'ForbiddenError', message: 'Can't update username'}
@@ -79,7 +92,7 @@
   ```
 
   **Requirements**
-  - A failed update doesn't not result in altered data
+  - A failed update does not result in altered data
   - Prevents updating to an invalid email
   - Prevents updating of a username
   - Prevents additional fields being added to the user
@@ -93,27 +106,78 @@
 
 **Request**
   ```
-    pw: password123
+    pw: password123 // todo this would be hashed
   ```
 
   **Response**
   ```
     Accepted: 200
 
-    Denied:
-      {code: '', message: "A 'pw' header is required for this endpoint"}
+    Denied: 422
+      {code: 'UnprocessableEntityError', message: "A 'pw' header is required for this endpoint"}
 
-    Denied:
-      {code: '', message: 'Bad username or password'}
+    Denied: 403
+      {code: 'ForbiddenError', message: 'Bad username or password'}
   ```
 
   **Requirements**
   - the user's hashed pw in the pw header
 
-  Used to delete a user's entire account and information.
+  Used to delete a user's entire account and information, including entries.
   There is no going back from running this command and so it should be guarded quite heavily.
 
 ### Fetch User
+
+> GET /user/:uid
+
+  **Request**
+  ```
+  xContent-Type: 'application/json'
+  {
+    username: true,
+    email: true,
+    config: {
+      thingy: true
+    }
+  }
+  ```
+
+  **Response**
+  ```
+  Accepted: 200
+    {
+      username: "cavejay",
+      email: "cavejay@github.com",
+      config: {
+        thingy: "thingydata"
+      }
+    }
+
+  Denied: 422
+    {code: 'UnprocessableEntityError', message: 'Invalid Field'}
+
+  Denied: 404 
+    {code: 'NotFoundError', message: 'User doesn't exist'}
+
+  Denied: 403
+    {code: 'ForbiddenError', message: 'Can't access this user'} // todo access via token
+
+  Denied: 422
+    {code: 'UnprocessableEntityError', message: 'Requested fields conflict'}
+  
+  Denied: 
+    {code: 'UnprocessableEntityError', message: 'Invalid fields'}
+  ```
+
+  **Requirements**
+  - `/user/:uid/all` returns all of the data for the user and requires no body
+  - requested fields must exist in a user's profile
+  - requested fields should not conflict
+  - user must exist
+  - can only access your own user through this method unless admin
+
+
+  Used to request data about a user in either full or incremental form 
 
 ### Check User
 
@@ -130,10 +194,10 @@
     exists: boolean
 
   Denied: 400
-    body: "A 'username' header is required for this endpoint"
+    {code: 'BadRequestError', message: "Missing required username header"}
 
   Denied: 401
-    This will happen if you have no authentication
+    {code: 'UnauthorizedError', message: "Provided no authentication"}
   ```
 
   **Requirements**

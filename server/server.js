@@ -32,7 +32,7 @@ var logged_in = {};
 server.use(function (req, res, next) {
   if (req.header('pw') != require('./pw')) {
     // res.send(401, 'Password incorrect');
-    return next(new restify.UnauthorizedError("You didn't enter the password :("));
+    return next(new restify.UnauthorizedError("Provided no authentication"));
   }
   return next();
 });
@@ -144,7 +144,7 @@ server.post('/user/new', function (req, res, next) {
 server.get('/user/check', function (req, res, next) {
   log.api('Check for user called %s', req.header('username'));
   if (req.header('username') === undefined) {
-    return next(new restify.BadRequestError("A 'username' header is required for this endpoint"));
+    return next(new restify.BadRequestError("Missing required username header"));
   }
   db.checkForUser(req.header('username')).then(userExists => {
     res.header('exists', userExists);

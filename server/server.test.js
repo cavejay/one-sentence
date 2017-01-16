@@ -18,7 +18,12 @@ describe('-- User accounts --', function () {
     it('requires athentication', (done) => { // This might need some re-work?
       request(app)
         .get('/user/check')
-        .expect(401, done);
+        .expect(401)
+        .end((err, res) => {
+            if (err) return done(err);
+            expect(res.body.message).to.equal('Provided no authentication');
+            return done();
+          });
     });
 
     it('reports correctly if the user exists', (done) => {
@@ -64,7 +69,7 @@ describe('-- User accounts --', function () {
           .expect(400)
           .end((err, res) => {
             if (err) return done(err);
-            expect(res.body.message).to.equal('A \'username\' header is required for this endpoint');
+            expect(res.body.message).to.equal('Missing required username header');
             return done();
           });
       });
@@ -129,10 +134,9 @@ describe('-- User accounts --', function () {
               .expect(422)
               .end((err2, res2) => {
                 if (err2) return done(err2);
-                if (res2.body.code == 'UnprocessableEntityError' &&
-                    res2.body.message == 'Username already exists') {
-                  done();
-                }
+                expect(res2.body.code).to.equal('UnprocessableEntityError');
+                expect(res2.body.message).to.equal('Username already exists');
+                return done();
               });
           });
       });
@@ -153,10 +157,9 @@ describe('-- User accounts --', function () {
           .expect(422)
           .end((err, res) => {
             if (err) return done(err);
-            if (res.body.code == 'UnprocessableEntityError' &&
-                res.body.message == 'Email is invalid') {
-              done();
-            }
+            expect(res.body.code).to.equal('UnprocessableEntityError');
+            expect(res.body.message).to.equal('Email is invalid');
+            return done();
           });
       });
     });
@@ -176,10 +179,9 @@ describe('-- User accounts --', function () {
           .expect(422)
           .end((err, res) => {
             if (err) return done(err);
-            if (res.body.code == 'UnprocessableEntityError' &&
-                res.body.message == 'Password doesn\'t meet requirements') {
-              done();
-            }
+            expect(res.body.code).to.equal('UnprocessableEntityError');
+            expect(res.body.message).to.equal('Password doesn\'t meet requirements');
+            return done();
           });
       });
     });
@@ -199,10 +201,9 @@ describe('-- User accounts --', function () {
           .expect(422)
           .end((err, res) => {
             if (err) return done(err);
-            if (res.body.code == 'UnprocessableEntityError' &&
-                res.body.message == 'Username is invalid') {
-              done();
-            }
+            expect(res.body.code).to.equal('UnprocessableEntityError');
+            expect(res.body.message).to.equal('Username is invalid');
+            return done();
           });
       });
     });
@@ -226,9 +227,14 @@ describe('-- User accounts --', function () {
     it('frees up the deleted users username for reuse');
   });
 
-  // describe('/user/fetch/:uid', function () {
-
-  // });
+  describe('/user/fetch/:uid', function () {
+    it('Doesn\'t except invalid fields');
+    it('fails when the user doesn\'t exist');
+    it('allows access to the user that is signed in');
+    it('prevents duplicate fields in the request');
+    it('will only fetch the fields requested');
+    it('will fetch all the user\'s data on the optional /all endpoint');
+  });
 });
 
 describe('-- User Diary Entries --', function () {

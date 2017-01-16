@@ -85,7 +85,7 @@ v0.0.1
     {code: 'UnprocessableEntityError', message: 'Username does not exist'}
 
   Denied: 422
-    {code: 'UnprocessableEntityError', message: 'Bad email address'}
+    {code: 'UnprocessableEntityError', message: 'Email is invalid'}
 
   Denied: 422
     {code: 'UnprocessableEntityError', message: 'Invalid Field'}
@@ -125,6 +125,7 @@ v0.0.1
 
   Used to delete a user's entire account and information, including entries.
   There is no going back from running this command and so it should be guarded quite heavily.
+  I think this endpoint needs more work // todo
 
 ### Fetch User
 

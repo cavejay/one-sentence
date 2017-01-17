@@ -1,6 +1,6 @@
 # Sentence Server API
 
-v0.0.1
+v0.01b
 
 ## User Endpoints ##
 ---
@@ -51,10 +51,10 @@ v0.0.1
   ```
   
   **Requirements**
-  - Usernames must not have any spaces // TODO update to this: "be made of alphanumeric characters and any of the following: `-`, `_`."
-  - Passwords must not have any spaces // TODO update this and tests for v1
+  - Usernames must be made of alphanumeric characters and any of the following: `-`, `_`.
+  - Passwords must be at least 8 alphanumeric characters long and contain atleast 1 normal letter, 1 capital and 1 numerical character
   - Username must be unique
-  - Emails must have an `@` sign followed by something and then a `.`
+  - Emails must be alphanumeric, have a single `@` sign followed by something and then a `.`
 
   Used to create a new user and receive your uid to actually start making calls.
   Use `/user/check` before running this to ensure the username is available.

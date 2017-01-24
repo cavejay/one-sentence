@@ -11,7 +11,7 @@ checks.checkPasswordValidity = function (str) {
   if ((str.match(/[0-9]/g) || []).length < 1) return false;
   if ((str.match(/[A-Z]/g) || []).length < 1) return false;
   if ((str.match(/[a-z]/g) || []).length < 1) return false;
-  return str.match(/^[a-zA-Z0-9]+$/) !== null;
+  return str.match(/^[a-zA-Z0-9#.*&^%$@!\-\_]+$/) !== null;
 }
 
 checks.checkEmailValidity = function (str) {

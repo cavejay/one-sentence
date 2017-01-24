@@ -203,13 +203,44 @@ describe('-- User accounts --', function () {
             if (err) return done(err);
             expect(res.body.code).to.equal('UnprocessableEntityError');
             expect(res.body.message).to.equal('Username is invalid');
-            return done();
+            
+            request(app)
+              .post('/user/new')
+              .set('pw', require('./pw'))
+              .set('Accept', 'application/json')
+              .send({
+                username: 'jimbo.lolcats',
+                pw: 'ThisIsPassword42',
+                email: 'HI@hi.com',
+                name: 'Jimmy JOnes'
+              })
+              .expect(422)
+              .end((err, res) => {
+                if (err) return done(err);
+                expect(res.body.code).to.equal('UnprocessableEntityError');
+                expect(res.body.message).to.equal('Username is invalid');
+
+                request(app)
+                  .post('/user/new')
+                  .set('pw', require('./pw'))
+                  .set('Accept', 'application/json')
+                  .send({
+                    username: 'xXx_cr@ppyUser_xXx',
+                    pw: 'ThisIsPassword12',
+                    email: 'HI@hi.com',
+                    name: 'Michael X'
+                  })
+                  .expect(422)
+                  .end((err, res) => {
+                    if (err) return done(err);
+                    expect(res.body.code).to.equal('UnprocessableEntityError');
+                    expect(res.body.message).to.equal('Username is invalid');
+                    return done();
+                  });
+              });
           });
       });
     });
-    it('catches invalid usernames 2');
-    it('catches invalid usernames 3');
-    it('catches invalid usernames 4');
   });
 
   describe('/user/update', function () {

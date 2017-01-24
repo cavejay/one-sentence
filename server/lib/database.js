@@ -15,6 +15,7 @@ database.r = r;
 // 	 id = unique user id, // filled by mongo
 //   name = [first, last],
 //   username = '',
+//   email = '',
 //   pwhash = '',
 //   settings = {
 // 	   daily_reminder = true,
@@ -50,11 +51,12 @@ database.init = function () {
 
 /***************	User	***************/
 
-database.makeUser = function(username, first, last, pwhash, callback) {
+database.makeUser = function(username, first, last, email, pwhash, callback) {
   if (callback == undefined) {
     return r.table('users').insert({
       username: username,
       name: [first, last],
+      email: email,
       pwhash: pwhash
     }).run().then((result) => {
       return new Promise((resolve, reject) => {
@@ -65,6 +67,7 @@ database.makeUser = function(username, first, last, pwhash, callback) {
     r.table('users').insert({
       username: username,
       name: [first, last],
+      email: email,
       pwhash: pwhash
     }).run().then((result) => {
       callback(result.generated_keys[0]);
@@ -82,7 +85,7 @@ database.removeUser = function(user_uid, callback) {
   }
 }
 
-database.getUser = function(user_uid, callback, reqData) {
+database.getUser = function(user_uid, callback, reqData) { // todo flesh out reqData
   if (callback == undefined) {
     return r.table('users').get(user_uid).run();
   } else {
@@ -190,7 +193,8 @@ database.checkByUsername = function(username, callback) {
   }
 }
 
-database.verifyUser = function(uid, callback) {
+// what was this even for? Checking that a user's entry was complete and proper?
+database.verifyUser = function(uid, callback) { 
   return new Promise((resolve, reject) => {
     resolve(true); // todo this is broken needs fixing (and testing);
   });

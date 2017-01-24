@@ -125,6 +125,7 @@ describe('-- Users Endpoints -- ', function () {
   var ex = {
     name: ['First', 'last'],
     username: 'user1',
+    email: "foo@barr.com",
     pwhash: '1jjkjl12k39sad'
   };
 
@@ -132,7 +133,7 @@ describe('-- Users Endpoints -- ', function () {
     var ee = Object.assign({}, ex);
     it('correctly creates users', done => {
       r.tableCreate('users').run().then(() => {
-        return db.makeUser(ex.username, ex.name[0], ex.name[1], ex.pwhash);
+        return db.makeUser(ex.username, ex.name[0], ex.name[1], ex.email, ex.pwhash);
       }).then(result => {
         ee.id = result;
         return r.table('users').get(result).run();
@@ -144,7 +145,7 @@ describe('-- Users Endpoints -- ', function () {
   });
 
   describe('The User update endpoint:', function () {
-    it('updates user information', done => {
+    it('updates user information (name)', done => {
       var id;
       var ee = Object.assign({}, ex);
       ee.name[0] = 'Not the';
@@ -162,6 +163,25 @@ describe('-- Users Endpoints -- ', function () {
         done();
       });
     });
+
+    it('updates user information (email)', done => {
+      var id;
+      var ee = Object.assign({}, ex);
+      ee.email = 'haha@hehe.ho';
+      r.tableCreate('users').run().then(() => {
+        return r.table('users').insert(ex).run();
+      }).then(result => {
+        id = result.generated_keys[0];
+        return db.updateUser(id, ee);
+      }).then(() => {
+        return r.table('users').get(id).run();
+      }).then(result => {
+        ee.id = id;
+        assert.deepEqual(ee, result);
+        done();
+      });
+    });
+
   });
 
   describe('The User delete endpoint:', function () {

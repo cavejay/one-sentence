@@ -14,7 +14,7 @@ describe('-- User accounts --', function () {
     before(utils.beforeEach);
     after(utils.afterEach);
 
-    var user1 = {username: 'tester1', first: 'First', last: 'Last', pwhash: 'pwlol95'};
+    var user1 = {username: 'tester1', first: 'First', last: 'Last', email: 'johnny@ives.com', pwhash: 'pwlol95'};
     it('requires athentication', (done) => { // This might need some re-work?
       request(app)
         .get('/user/check')
@@ -28,12 +28,13 @@ describe('-- User accounts --', function () {
 
     it('reports correctly if the user exists', (done) => {
       db.r.tableCreate('users').run().then(() => {
-          return db.makeUser(user1.username, user1.first, user1.last, user1.pwhash);
+          return db.makeUser(user1.username, user1.first, user1.last, user1.email, user1.pwhash);
       }).then(() => {
         request(app)
           .get('/user/check')
           .set('pw', require('./pw'))
-          .set('username', 'tester1')
+          .set('username', user1.username)
+          .set('email', user1.email)
           .expect(200)
           .expect('exists', 'false')
           .end((err, res) => {
@@ -50,6 +51,7 @@ describe('-- User accounts --', function () {
         .get('/user/check')
         .set('pw', require('./pw'))
         .set('username', 'testerNotThere')
+        .set('email', user1.email)
         .expect(200)
         .expect('exists', 'false')
         .end((err, res) => {
@@ -186,7 +188,7 @@ describe('-- User accounts --', function () {
       });
     });
 
-    it('catches invalid usernames 1', done => {
+    it('catches invalid usernames', done => {
       db.r.tableCreate('users').run().then(() => {
         request(app)
           .post('/user/new')
@@ -244,12 +246,150 @@ describe('-- User accounts --', function () {
   });
 
   describe('/user/update', function () {
-    it('doesn\'t update users that don\'t exist');
-    it('updates only the part of the user that\'s relevant');
-    it('catches invalid emails');
-    it('prevents changing of username');
+    it('doesn\'t update users that don\'t exist', done => {
+      db.r.tableCreate('users').run().then(() => {
+        request(app)
+          .put('/user/ee7450e0-25f3-4d8a-ad5f-0849d627141c')
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            email: 'HI@hi.com',
+          })
+          .expect(422)
+          .end((err, res) => {
+            if (err) return done(err);
+            expect(res.body.code).to.equal('UnprocessableEntityError');
+            expect(res.body.message).to.equal('Username does not exist');
+            // make sure the user doesn't actually exist
+            db.checkForUser("ee7450e0-25f3-4d8a-ad5f-0849d627141c").then(result => {
+              expect(result).to.be.false;
+              return done();
+            });
+          });
+      });
+    });
+    
+    it('catches invalid emails', done => {
+      db.r.tableCreate('users').run().then(() => {
+        return db.makeUser("cavejay", 'foo', 'bar', 'hi@hi.com', '9123jasdkFDf1');
+      }).then(uid => {
+        request(app)
+          .put('/user/'+uid)
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            email: 'its@a.$cam',
+          })
+          .expect(422)
+          .end((err, res) => {
+            if (err) return done(err);
+            expect(res.body.code).to.equal('UnprocessableEntityError');
+            expect(res.body.message).to.equal('Email is invalid');
+            return done();
+          });
+      });
+    });
+
+    it('processes the data before the uid', done => {
+      // this should improve performance, 'cause then we're not waiting on the db
+      request(app)
+        .put('/user/'+uid)
+        .set('pw', require('./pw'))
+        .set('Accept', 'application/json')
+        .send({
+          username: "the most edge lord",
+        })
+        .expect(422)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body.code).to.equal('ForbiddenError');
+          expect(res.body.message).to.equal("Can't update username");
+          return done();
+        });
+    })
+    
+    it('prevents changing of username', done => {
+      db.r.tableCreate('users').run().then(() => {
+        return db.makeUser("cavejay", 'foo', 'bar', 'hi@hi.com', '9123jasdkFDf1');
+      }).then(uid => {
+        request(app)
+          .put('/user/'+uid)
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            username: "edgelord",
+          })
+          .expect(422)
+          .end((err, res) => {
+            if (err) return done(err);
+            expect(res.body.code).to.equal('ForbiddenError');
+            expect(res.body.message).to.equal("Can't update username");
+            return done();
+          });
+      });
+    });
+    
+    it('doesn\'t change data when it something fails', done => {
+      db.r.tableCreate('users').run().then(() => {
+        return db.makeUser("cavejay", 'foo', 'bar', 'hi@hi.com', '9123jasdkFDf1');
+      }).then(uid => {
+        return db.getUser(uid);
+      }).then(userData => {
+        request(app)
+          .put('/user/'+userData.id)
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            email: "heh@@foo.bar",
+          })
+          .expect(422)
+          .end((err, res) => {
+            if (err) return done(err);
+            expect(res.body.code).to.equal('UnprocessableEntityError');
+            expect(res.body.message).to.equal("Email is invalid");
+
+            // compare user data from before and now
+            db.getUser(userData.id).then( result => {
+              expect(result).to.deep.equal(userData);
+              return done();
+            });
+
+          });
+      });
+    });
+
+    it('updates only the part of the user that\'s relevant', done => {
+      db.r.tableCreate('users').run().then(() => {
+        return db.makeUser("cavejay", 'foo', 'bar', 'hi@hi.com', '9123jasdkFDf1');
+      }).then(uid => {
+        return db.getUser(uid);
+      }).then(userData => {
+        request(app)
+          .put('/user/'+userData.id)
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            email: "heh@foo.bar",
+          })
+          .expect(200)
+          .end((err, res) => {
+            if (err) return done(err);
+
+            // make sure it matches what was expected
+            userData.email = "heh@foo.bar";
+            expect(userData).to.deep.equal(res.body);
+
+            // make sure it matches what was recorded
+            db.getUser(res.body.id).then( result => {
+              expect(result).to.deep.equal(res.body);
+              return done();
+            });
+
+          });
+      });
+    });
+
     it('doesn\'t add fields that shouldn\'t exist to the user');
-    it('doesn\'t change data when it something fails');
   });
 
   describe('/user/delete', function () {

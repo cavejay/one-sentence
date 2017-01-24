@@ -12,7 +12,7 @@ database.r = r;
 // Functions return a promise if there is no callback
 
 // user = {
-// 	 id = unique user id, // filled by mongo
+// 	 id = unique user id, // filled by rethinkdb
 //   name = [first, last],
 //   username = '',
 //   email = '',

@@ -135,7 +135,7 @@ server.post('/user/new', function (req, res, next) {
     }
     var first = req.params.name.split(' ')[0];
     var last =  req.params.name.split(' ')[1];
-    db.makeUser(req.params.username, first, last, req.params.pwhash).then(uid => {
+    db.makeUser(req.params.username, first, last, req.params.email, req.params.pwhash).then(uid => {
       return res.send(201, {'uid': uid});
     });
   });
@@ -153,7 +153,7 @@ server.get('/user/check', function (req, res, next) {
   return next();
 });
 
-server.put('/user/update/:uid', function (req, res, next) {
+server.put('/user/:uid', function (req, res, next) {
   log.api('Update for user called %s', req.params.uid);
 });
 

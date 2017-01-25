@@ -245,7 +245,7 @@ describe('-- User accounts --', function () {
     });
   });
 
-  describe.only('/user/update', function () {
+  describe('/user/update', function () {
     it('doesn\'t update users that don\'t exist', done => {
       db.r.tableCreate('users').run().then(() => {
         request(app)

@@ -36,7 +36,7 @@ describe('-- User accounts --', function () {
           .set('username', user1.username)
           .set('email', user1.email)
           .expect(200)
-          .expect('exists', 'false')
+          .expect('exists', 'true')
           .end((err, res) => {
             if (err) return done(err);
             expect(res.body).to.be.empty;
@@ -245,7 +245,7 @@ describe('-- User accounts --', function () {
     });
   });
 
-  describe('/user/update', function () {
+  describe.only('/user/update', function () {
     it('doesn\'t update users that don\'t exist', done => {
       db.r.tableCreate('users').run().then(() => {
         request(app)
@@ -255,11 +255,11 @@ describe('-- User accounts --', function () {
           .send({
             email: 'HI@hi.com',
           })
-          .expect(422)
+          // .expect(422)
           .end((err, res) => {
             if (err) return done(err);
+            expect(res.body.message).to.equal('User does not exist');
             expect(res.body.code).to.equal('UnprocessableEntityError');
-            expect(res.body.message).to.equal('Username does not exist');
             // make sure the user doesn't actually exist
             db.checkForUser("ee7450e0-25f3-4d8a-ad5f-0849d627141c").then(result => {
               expect(result).to.be.false;
@@ -293,13 +293,13 @@ describe('-- User accounts --', function () {
     it('processes the data before the uid', done => {
       // this should improve performance, 'cause then we're not waiting on the db
       request(app)
-        .put('/user/'+uid)
+        .put('/user/ee7450e0-25f3-4d8a-ad5f-0849d627141c')
         .set('pw', require('./pw'))
         .set('Accept', 'application/json')
         .send({
           username: "the most edge lord",
         })
-        .expect(422)
+        .expect(403)
         .end((err, res) => {
           if (err) return done(err);
           expect(res.body.code).to.equal('ForbiddenError');
@@ -319,7 +319,7 @@ describe('-- User accounts --', function () {
           .send({
             username: "edgelord",
           })
-          .expect(422)
+          .expect(403)
           .end((err, res) => {
             if (err) return done(err);
             expect(res.body.code).to.equal('ForbiddenError');
@@ -384,12 +384,35 @@ describe('-- User accounts --', function () {
               expect(result).to.deep.equal(res.body);
               return done();
             });
-
           });
       });
     });
 
-    it('doesn\'t add fields that shouldn\'t exist to the user');
+    it('doesn\'t add fields that shouldn\'t exist to the user', done => {
+      db.r.tableCreate('users').run().then(() => {
+        return db.makeUser("cavejay", 'foo', 'bar', 'hi@hi.com', '9123jasdkFDf1');
+      }).then(uid => {
+        request(app)
+          .put('/user/'+uid)
+          .set('pw', require('./pw'))
+          .set('Accept', 'application/json')
+          .send({
+            email: "legitemail@outlook.com",
+            superhack: "sum_script_here"
+          })
+          .expect(422)
+          .end((err, res) => {
+            if (err) return done(err);
+            console.log('we return');
+            console.log(res.body);
+            expect(res.body.code).to.equal('UnprocessableEntityError');
+            expect(res.body.message).to.equal("Invalid Field");
+            return done();
+          });
+      });
+    });
+
+    it('updates dates specific fields of the user');
   });
 
   describe('/user/delete', function () {

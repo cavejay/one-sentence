@@ -39,15 +39,10 @@ v0.01b
 
   Denied: 422
     {code: 'UnprocessableEntityError', message: 'Username already exists'}
-
-  Denied: 422
     {code: 'UnprocessableEntityError', message: 'Username is invalid '}
-
-  Denied: 422
     {code: 'UnprocessableEntityError', message: 'Password doesn't meet requirements'}
-
-  Denied: 422
     {code: 'UnprocessableEntityError', message: 'Email is invalid'}
+
   ```
   
   **Requirements**
@@ -80,20 +75,19 @@ v0.01b
 
   Denied: 403
     {code: 'ForbiddenError', message: 'Can't update username'}
+    {code: 'ForbiddenError', message: 'Can't update user id'}
 
   Denied: 422
-    {code: 'UnprocessableEntityError', message: 'Username does not exist'}
-
-  Denied: 422
+    {code: 'UnprocessableEntityError', message: 'User does not exist'}
     {code: 'UnprocessableEntityError', message: 'Email is invalid'}
-
-  Denied: 422
     {code: 'UnprocessableEntityError', message: 'Invalid Field'}
+
   ```
 
   **Requirements**
   - A failed update does not result in altered data
   - Prevents updating to an invalid email
+  - Prevents updating of id or uid
   - Prevents updating of a username
   - Prevents additional fields being added to the user
 
@@ -154,9 +148,6 @@ v0.01b
       }
     }
 
-  Denied: 422
-    {code: 'UnprocessableEntityError', message: 'Invalid Field'}
-
   Denied: 404 
     {code: 'NotFoundError', message: 'User doesn't exist'}
 
@@ -165,6 +156,7 @@ v0.01b
 
   Denied: 422
     {code: 'UnprocessableEntityError', message: 'Requested fields conflict'}
+    {code: 'UnprocessableEntityError', message: 'Invalid Field'}
   
   Denied: 
     {code: 'UnprocessableEntityError', message: 'Invalid fields'}

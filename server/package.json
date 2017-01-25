@@ -13,6 +13,7 @@
   "author": "Michael",
   "license": "ISC",
   "dependencies": {
+    "lodash": "^4.17.4",
     "promise": "^7.0.4",
     "restify": "^4.1.1",
     "rethinkdbdash": "^2.3.17"

@@ -1,7 +1,8 @@
 var restify = require('restify'),
 		fs 			= require('fs'), // needed for cert and key of server (if https)
-		db 	= require('./lib/database.js');
-    log = require('./lib/log.js');
+    _ = require('lodash'),
+		db 	= require('./lib/database.js'),
+    log = require('./lib/log.js'),
     checks = require('./lib/checks.js');
 
 var server = restify.createServer({
@@ -146,7 +147,7 @@ server.get('/user/check', function (req, res, next) {
   if (req.header('username') === undefined) {
     return next(new restify.BadRequestError("Missing required username header"));
   }
-  db.checkForUser(req.header('username')).then(userExists => {
+  db.checkByUsername(req.header('username')).then(userExists => {
     res.header('exists', userExists);
     res.send(200);
   });
@@ -155,6 +156,35 @@ server.get('/user/check', function (req, res, next) {
 
 server.put('/user/:uid', function (req, res, next) {
   log.api('Update for user called %s', req.params.uid);
+  // check what they want updated
+  if (req.params.email != null && !checks.checkEmailValidity(req.params.email)) {
+    return next(new restify.UnprocessableEntityError('Email is invalid'));
+  } 
+  if (req.params.username) {
+    return next(new restify.ForbiddenError('Can\'t update username'));
+  } else if (req.params.id) {
+    return next(new restify.ForbiddenError('Can\'t update user id'));
+  }
+  // check there are only the correct fields // todo rewrite this to be nicer
+  var allowedFields = {username: '', name: '', uid: '', email: '', pwhash: '', settings: ''};
+  var mixedObj = Object.assign({}, req.params, allowedFields);
+  if (!_.isEmpty(_.xor(Object.keys(allowedFields), Object.keys(mixedObj)))) {
+    return next(new restify.UnprocessableEntityError('Invalid Field'));
+  }
+  
+  // check uid
+  db.checkForUser(req.params.uid).then(userExists => {
+    if (!userExists) {
+      return new restify.UnprocessableEntityError('User does not exist');
+    }
+
+    // attempt it
+    return db.updateUser(req.params.uid, _.omit(req.params, 'uid'));
+  }).then(result => {
+    res.send(200, result);
+  }).catch(err => {
+    return next(err);
+  }); 
 });
 
 // login to a user

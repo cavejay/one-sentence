@@ -99,9 +99,10 @@ database.updateUser = function(user_uid, user_data, callback) {
   if (callback == undefined) {
     return r.table('users').get(user_uid).update(user_data)
     .run().then((result) => {
-      return new Promise((resolve, reject) => {
-        resolve(user_uid); // todo return full updated object
-      });
+      return database.getUser(user_uid);
+      // new Promise((resolve, reject) => {
+      //   resolve(user_uid); // todo return full updated object
+      // });
     });
   } else {
     r.table('users').get(user_uid).update(user_data).run().then(() => {
@@ -148,7 +149,7 @@ database.getAllEntriesForUser = function(uid, onlyIds, callback) {
 //
 // };
 
-// callback is passed true or false depending on whether the user exists.
+// callback is passed true or false depending on whether the uid exists.
 database.checkForUser = function(user_uid, callback) {
   if (callback == undefined) {
     return r.table('users').get(user_uid).run().then(result => {
@@ -171,6 +172,7 @@ database.checkForUser = function(user_uid, callback) {
   }
 }
 
+// callback is passed true or not depending on whether the username exists
 database.checkByUsername = function(username, callback) {
   if (callback == undefined) {
     return r.table('users').filter({username: username}).run().then(result => {

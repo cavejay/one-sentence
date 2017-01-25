@@ -102,6 +102,9 @@ describe('-- Login Helper --', function () {
       return db.checkForUser('testinglol');
     }).then(result => {
       assert.isNotTrue(result);
+      return db.checkForUser('test');
+    }).then(result => { // should not find usernames, as successful
+      assert.isNotTrue(result);
       done();
     });
   });
@@ -109,7 +112,10 @@ describe('-- Login Helper --', function () {
   it('can check for users by username', done => {
     r.tableCreate('users').run().then(() => {
       return db.makeUser('username007', 'he', 'man', '123jaldk23;123');
-    }).then(() => {
+    }).then(id => {
+      return db.checkByUsername(id); // should not find uids as successful
+    }).then(result => {
+      assert.isFalse(result);
       return db.checkByUsername('user2');
     }).then(result => {
       assert.isFalse(result);
@@ -142,6 +148,12 @@ describe('-- Users Endpoints -- ', function () {
         done();
       });
     });
+  });
+
+  describe('The User check endpoint', function () {
+    it('returns true for users that exist');
+    it('returns false for users that don\'t exist');
+    it('returns false for users that have been deleted');
   });
 
   describe('The User update endpoint:', function () {

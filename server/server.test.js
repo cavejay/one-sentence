@@ -329,7 +329,7 @@ describe('-- User accounts --', function () {
       });
     });
     
-    it('doesn\'t change data when it something fails', done => {
+    it('doesn\'t change data when something fails', done => {
       db.r.tableCreate('users').run().then(() => {
         return db.makeUser("cavejay", 'foo', 'bar', 'hi@hi.com', '9123jasdkFDf1');
       }).then(uid => {
@@ -403,22 +403,97 @@ describe('-- User accounts --', function () {
           .expect(422)
           .end((err, res) => {
             if (err) return done(err);
-            console.log('we return');
-            console.log(res.body);
             expect(res.body.code).to.equal('UnprocessableEntityError');
             expect(res.body.message).to.equal("Invalid Field");
             return done();
           });
       });
     });
-
-    it('updates dates specific fields of the user');
   });
 
   describe('/user/delete', function () {
-    it('removes the user info');
-    it('removes all of the user\'s entries from the database');
-    it('frees up the deleted users username for reuse');
+    it('removes the user info', done => {
+      Promise.all([
+        db.r.tableCreate('users').run(),
+        db.r.tableCreate('entries').run()
+      ]).then(() => {
+        return db.makeUser("cavejay", 'foo', 'bar', 'hi@hi.com', '9123jasdkFDf1');
+      }).then(uid => {
+        request(app)
+          .del('/user/'+uid)
+          .set('pw', require('./pw'))
+          .send()
+          .expect(200)
+          .end((err, res) => {
+            if (err) return done(err);
+            expect(res.body).to.be.empty;
+
+            db.checkForUser(uid).then(result => {
+              expect(result).to.be.false;
+              return done();
+            });
+          });
+      })
+    });
+
+    it('removes all of the user\'s entries from the database', done => {
+      Promise.all([
+        db.r.tableCreate('users').run(),
+        db.r.tableCreate('entries').run()
+      ]).then(() => {
+        return db.makeUser("cavejay", 'foob', 'obar', 'hi@hi.com', '9123jasdkFDf1');
+      }).then(uid => {
+        entries = [
+          {uid: uid,datetime: '12312344124',text: 'test1'},
+          {uid: uid,datetime: '12312324124',text: 'test2',  oldtext: ['lol not a test', 'lol mott a tet']},
+          {uid: 'aas-asdgq',datetime: '12312354124',text: ''},
+          {uid: 'asdasd-13213-',datetime: '12312488124',text: ''}
+        ]
+        db.makeEntries(entries).then(eids => {
+          request(app)
+            .del('/user/'+uid)
+            .set('pw', require('./pw'))
+            .send()
+            .expect(200)
+            .end((err, res) => {
+              if (err) return done(err);
+              expect(res.body).to.be.empty;
+
+              db.getEntry(eids[0]).then(result => {
+                expect(result).to.be.null;
+                return db.getEntry(eids[1]);
+              }).then(result => {
+                expect(result).to.be.null;
+                return done();
+              });
+
+              // Should also check we're not removing other things from the entries
+            });
+        });
+      });
+    });
+
+    xit('frees up the deleted user\'s username for reuse', done => {
+      Promise.all([
+        db.r.tableCreate('users').run(),
+        db.r.tableCreate('entries').run()
+      ]).then(() => {
+        return db.makeUser("cavejay", 'foob', 'obar', 'hi@hi.com', '9123jasdkFDf1');
+      }).then(uid => {
+        request(app)
+          .del('/user/'+uid)
+          .set('pw', require('./pw'))
+          .send()
+          .expect(200)
+          .end((err, res) => {
+            if (err) return done(err);
+            expect(res.body).to.be.empty;
+            
+            // Try to make a new user with the same username here
+
+          });
+      });
+    });
   });
 
   describe('/user/fetch/:uid', function () {

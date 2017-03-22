@@ -187,6 +187,19 @@ server.put('/user/:uid', function (req, res, next) {
   }); 
 });
 
+server.del('/user/:uid', function (req,res,next) {
+  log.api('Removing user called %s', req.params.uid);
+
+  Promise.all([
+    db.removeUser(req.params.uid),
+    db.r.table('entries').filter({uid: req.params.uid}).delete().run()
+  ]).then(() => {
+    res.send(200);
+  }).catch(err => {
+    console.log(err);
+  });
+})
+
 // login to a user
 server.get('/login/:uid', function (req, res, next) {
 	// If there was no current session

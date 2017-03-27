@@ -411,7 +411,11 @@ describe('-- User accounts --', function () {
     });
   });
 
-  describe('/user/delete', function () {
+  describe.only('/user/delete', function () {
+    it('requires extra authentication');
+
+    it('gives a proper failure message for bad authentication')
+
     it('removes the user info', done => {
       Promise.all([
         db.r.tableCreate('users').run(),
@@ -473,7 +477,7 @@ describe('-- User accounts --', function () {
       });
     });
 
-    xit('frees up the deleted user\'s username for reuse', done => {
+    it('frees up the deleted user\'s username for reuse', done => {
       Promise.all([
         db.r.tableCreate('users').run(),
         db.r.tableCreate('entries').run()
@@ -490,7 +494,21 @@ describe('-- User accounts --', function () {
             expect(res.body).to.be.empty;
             
             // Try to make a new user with the same username here
-
+            request(app)
+              .post('/user/new')
+              .set('pw', require('./pw'))
+              .set('Accept', 'application/json')
+              .send({
+                username: 'cavejay',
+                pw: 'ThisIsPassword12',
+                email: 'HI@hi.com',
+                name: 'Michael X'
+              })
+              .expect(201)
+              .end((err, res) => {
+                if (err) return done(err);
+                done();
+              })
           });
       });
     });

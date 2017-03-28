@@ -536,7 +536,7 @@ describe('-- User accounts --', function () {
   describe('/user/fetch/:uid', function () {
     it('Doesn\'t except invalid fields');
     it('fails when the user doesn\'t exist');
-    it('allows access to the user that is signed in');
+    it('only allows access to the user that is signed in');
     it('prevents duplicate fields in the request');
     it('will only fetch the fields requested');
     it('will fetch all the user\'s data on the optional /all endpoint');

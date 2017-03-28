@@ -31,9 +31,11 @@ var logged_in = {};
 /***************		Login Checker		***************/
 
 server.use(function (req, res, next) {
-  if (req.header('pw') != require('./pw')) {
+  if (req.header('pw').length == 0) {
     // res.send(401, 'Password incorrect');
     return next(new restify.UnauthorizedError("Provided no authentication"));
+  } else if (req.header('pw') != require('./pw')) {
+    return next(new restify.ForbiddenError("Bad username or password"));
   }
   return next();
 });

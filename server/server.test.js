@@ -411,10 +411,29 @@ describe('-- User accounts --', function () {
     });
   });
 
-  describe.only('/user/delete', function () {
+  describe('/user/delete', function () {
     it('requires extra authentication');
 
-    it('gives a proper failure message for bad authentication')
+    it('gives a proper failure message for bad authentication', done => {
+       Promise.all([
+        db.r.tableCreate('users').run(),
+        db.r.tableCreate('entries').run()
+      ]).then(() => {
+        return db.makeUser("cavejay", 'foo', 'bar', 'hi@hi.com', '9123jasdkFDf1');
+      }).then(uid => {
+        request(app)
+          .del('/user/'+uid)
+          .set('pw', 'somepassword')
+          .send()
+          .expect(403)
+          .end((err, res) => {
+            if (err) return done(err);
+            expect(res.body.code).to.equal('ForbiddenError');
+            expect(res.body.message).to.equal("Bad username or password");
+            return done();
+          })
+      })
+    })
 
     it('removes the user info', done => {
       Promise.all([

@@ -1,3 +1,9 @@
+## Unfortunately this porject is no longer active
+
+It might be revisited one day but if looking for something similar I would suggest you try [daylio](https://play.google.com/store/apps/details?id=net.daylio) on the Android appstore
+
+---
+
 [![Build Status](https://travis-ci.org/cavejay/one-sentence.svg?branch=server)](https://travis-ci.org/cavejay/one-sentence)
 # one-sentence
 A easy to use implementation for a '1 sentence diary' that uses telegram and node to store sentences in a mongoDB

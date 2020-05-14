@@ -6,7 +6,7 @@
   "dependencies": {
     "cheerio": "^0.18.0",
     "colors": "^1.1.0",
-    "lodash": "^2.4.2",
+    "lodash": "^4.17.15",
     "log4js": "^0.6.27",
     "minimalist": "^1.0.0",
     "minimist": "^1.2.0",

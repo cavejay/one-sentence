@@ -1,4 +1,4 @@
-## Unfortunately this porject is no longer active
+## Unfortunately this project is no longer active
 
 It might be revisited one day but if looking for something similar I would suggest you try [daylio](https://play.google.com/store/apps/details?id=net.daylio) on the Android appstore
 
